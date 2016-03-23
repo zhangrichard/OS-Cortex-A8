@@ -17,11 +17,14 @@ uint32_t weight( uint32_t x ) {
 //   }
 // }
 void P2() {
+  char   buf[BUF_SIZE];
   while( 1 ) {
     // compute the Hamming weight of each x for 2^8 < x < 2^24
 
     for( uint32_t x = ( 1 << 8 ); x < ( 1 << 24 ); x++ ) {
-      uint32_t r = weight( x );  //printf( "weight( %d ) = %d\n", x, r );
+      uint32_t r = weight( x ); // printf( "weight( %d ) = %d\n", x, r );
+      sprintf(buf, "weight( %d ) = %d\n", x, r);
+      write(1, buf, strlen(buf));
     }
     
   }

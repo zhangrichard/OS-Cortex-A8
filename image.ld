@@ -24,4 +24,5 @@ SECTIONS {
     /* allocate stack for P1       */
   .       = . + 0x00001000;  
   tos_P2  = .;
+  PROVIDE (end = .);
 }
