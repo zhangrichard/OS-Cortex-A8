@@ -119,7 +119,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     }
     case 0x03:{ //exit()
       // empty the pcb content
-      free(current);
+      // free(current);
       memset( &current, 0, sizeof( pcb_t ) );
       memset( &current->ctx,0, sizeof(ctx_t));
    

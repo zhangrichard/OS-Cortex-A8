@@ -18,13 +18,13 @@ int write( int fd, void* x, size_t n ) {
   return r;
 }
 
-int forkS(){
+int fork(){
   int r;
   asm volatile("svc #2 \n"
                 :"=r"(r)
                 );
   return r;
 }
-int exitS(){
+int exit(){
   asm volatile("svc #3 \n");
 }

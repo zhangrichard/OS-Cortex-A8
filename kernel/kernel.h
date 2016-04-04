@@ -11,7 +11,7 @@
 #include "interrupt.h"
 
 
-#include <string.h>
+// #include <string.h>
 #include "P0.h"
 #include "P1.h"
 #include "P2.h"
