@@ -17,3 +17,14 @@ int write( int fd, void* x, size_t n ) {
 
   return r;
 }
+
+int forkS(){
+  int r;
+  asm volatile("svc #2 \n"
+                :"=r"(r)
+                );
+  return r;
+}
+int exitS(){
+  asm volatile("svc #3 \n");
+}

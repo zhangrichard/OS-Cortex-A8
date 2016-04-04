@@ -9,5 +9,6 @@ void yield();
 
 // write n bytes from x to the file descriptor fd
 int write( int fd, void* x, size_t n );
-
+int forkS();
+int exitS();
 #endif

@@ -18,6 +18,7 @@ uint32_t weight( uint32_t x ) {
 // }
 void P2() {
   char   buf[BUF_SIZE];
+  fork();
   while( 1 ) {
     // compute the Hamming weight of each x for 2^8 < x < 2^24
 

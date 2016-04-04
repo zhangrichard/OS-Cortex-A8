@@ -9,8 +9,11 @@
  *   can be created, and neither is able to complete.
  */
 
-pcb_t pcb[ 3 ], *current = NULL;
-
+pcb_t pcb[ PCB_SIZE ], *current = NULL;
+static int numberOfProcess =3;
+// void priorityBaseScheduler( ctx_t* ctx ) {
+  
+// }
 void scheduler( ctx_t* ctx ) {
   if      ( current == &pcb[ 0 ] ) {
     memcpy( &pcb[ 0 ].ctx, ctx, sizeof( ctx_t ) );
@@ -19,14 +22,14 @@ void scheduler( ctx_t* ctx ) {
   }
   else if ( current == &pcb[ 1 ] ) {
     memcpy( &pcb[ 1 ].ctx, ctx, sizeof( ctx_t ) );
-    memcpy( ctx, &pcb[ 2 ].ctx, sizeof( ctx_t ) );
-    current = &pcb[ 2 ];
-  }
-  else if ( current == &pcb[ 2 ] ) {
-    memcpy( &pcb[ 2 ].ctx, ctx, sizeof( ctx_t ) );
     memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
     current = &pcb[ 0 ];
   }
+  // else if ( current == &pcb[ 2 ] ) {
+  //   memcpy( &pcb[ 2 ].ctx, ctx, sizeof( ctx_t ) );
+  //   memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
+  //   current = &pcb[ 0 ];
+  // }
 }
 
 void kernel_handler_rst( ctx_t* ctx              ) { 
@@ -104,6 +107,24 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       ctx->gpr[ 0 ] = n;
       break;
     }
+    case 0x02:{ //fork()
+      //intinital new process in process block
+      memset( &pcb[ numberOfProcess ], 0, sizeof( pcb_t ) );
+      pcb[ numberOfProcess ].pid      = 3;        
+      // copy parent to child
+      memcpy( &pcb[ numberOfProcess ].ctx, &current->ctx, sizeof( ctx_t ) );
+
+      numberOfProcess++;
+      break;
+    }
+    case 0x03:{ //exit()
+      // empty the pcb content
+      free(current);
+      memset( &current, 0, sizeof( pcb_t ) );
+      memset( &current->ctx,0, sizeof(ctx_t));
+   
+      break;
+    }
     default   : { // unknown
       break;
     }
@@ -119,8 +140,8 @@ void kernel_handler_irq(ctx_t *ctx) {
   // Step 4: handle the interrupt, then clear (or reset) the source.
 
   if( id == GIC_SOURCE_TIMER0 ) {
-    scheduler(ctx);
-   TIMER0->Timer1IntClr = 0x01;
+  scheduler(ctx);
+  TIMER0->Timer1IntClr = 0x01;
   }
 
   // Step 5: write the interrupt identifier to signal we're done.

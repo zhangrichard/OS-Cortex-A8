@@ -27,6 +27,8 @@ int is_prime( uint32_t x ) {
 void P0() {
   char   buf[BUF_SIZE];
   int x = 0;
+  // fork();
+  
 
   while( 1 ) {
     // test whether each x for 2^8 < x < 2^24 is prime or not

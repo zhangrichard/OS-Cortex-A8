@@ -1,2 +1,3 @@
 |term| definition|
-|GIC
+|GIC interface |
+|
