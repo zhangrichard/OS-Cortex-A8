@@ -7,7 +7,7 @@
 #include   "GIC.h"
 #include "PL011.h"
 #include "SP804.h"
-
+#include "../device/PL011.h"
 #include "interrupt.h"
 
 

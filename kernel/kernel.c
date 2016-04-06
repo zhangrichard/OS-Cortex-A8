@@ -42,7 +42,8 @@ void kernel_handler_rst( ctx_t* ctx              ) {
    */
 
 
-
+  UART0->IMSC           |= 0x00000010; // enable UART    (Rx) interrupt
+  UART0->CR              = 0x00000301; // enable UART (Tx+Rx)
   TIMER0->Timer1Load     = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl     = 0x00000002; // select 32-bit   timer
   TIMER0->Timer1Ctrl    |= 0x00000040; // select periodic timer
@@ -53,7 +54,7 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   GICD0->ISENABLER[ 1 ] |= 0x00000010; // enable timer          interrupt
   GICC0->CTLR            = 0x00000001; // enable GIC interface
   GICD0->CTLR            = 0x00000001; // enable GIC distributor
-
+  // PL011_puts( UART0 , "Scheduler: initialising\n", 24);
   memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
   pcb[ 0 ].pid      = 0;
   pcb[ 0 ].ctx.cpsr = 0x50;
@@ -74,7 +75,7 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   /* Once the PCBs are initialised, we (arbitrarily) select one to be
    * restored (i.e., executed) when the function then returns.
    */
-
+  // PL011_puts( UART0 , "Scheduler: switching to process 0\n", 34);
   current = &pcb[ 0 ]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
   irq_enable();
 
@@ -91,10 +92,25 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
    */
 
   switch( id ) {
-    // case 0x00 : { // yield()
-    //   scheduler( ctx );
-    //   break;
-    // }
+    case 0x00 : { // read(fd,x,n)
+      // scheduler( ctx );
+      // break;
+      char cache[500];
+      int   fd = ( int   )( ctx->gpr[ 0 ] ); 
+      char*  x = ( char* )( ctx->gpr[ 1 ] );
+      int    n = ( int   )( ctx->gpr[ 2 ] );
+      int i = 0;
+      for( int i = 0; i < n; i++ ) {
+        cache[i] = PL011_getc( UART0 );
+        if(cache[i] == '\r'||i>n){
+          break;
+        }
+        
+      }
+      ctx->gpr[1] = cache[0];
+      ctx->gpr[0] = i;
+      break;
+    }
     case 0x01 : { // write( fd, x, n )
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
@@ -102,6 +118,9 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       for( int i = 0; i < n; i++ ) {
         PL011_putc( UART0, *x++ );
+        if (*x == '\0'){
+          break;
+        }
       }
       
       ctx->gpr[ 0 ] = n;
@@ -138,6 +157,7 @@ void kernel_handler_irq(ctx_t *ctx) {
   uint32_t id = GICC0->IAR;
 
   // Step 4: handle the interrupt, then clear (or reset) the source.
+
 
   if( id == GIC_SOURCE_TIMER0 ) {
   scheduler(ctx);
