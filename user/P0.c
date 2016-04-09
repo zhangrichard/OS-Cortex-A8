@@ -42,7 +42,9 @@ void P0() {
     //   PL011_putc( UART0, *x++ );
     // }
 
-
+  char * start = "enter \n";
+  char * output = "output is : \n";
+ 
   while( 1 ) {
     // test whether each x for 2^8 < x < 2^24 is prime or not
 
@@ -51,12 +53,16 @@ void P0() {
     //   sprintf(buf, "is_prime( %d ) = %d\n", x, r );
     //   write(1, buf, strlen(buf));
     // }
-    char * start = "enter the command \n";
-    write(1,start,5);
-  
-    read(1,cache,100);
-    
-    write(1,cache,100);
+  int length;  
+  write(1,start,7);
+  length= read(0,cache,100);
+  char * string = cache;
+  if (strcmp(string,"fork\r\n") == 0){
+    write(0,"yes\n",4);
+  }
+  write(0,output,13);
+  write(0,cache,length);
+  // write(1,"\n",1);
     
   }
 

@@ -71,5 +71,5 @@ uint8_t PL011_getc( PL011_t* d            );
 void    PL011_puth( PL011_t* d, uint8_t x );
 // recieve  hexified byte x via PL011 instance d
 uint8_t PL011_geth( PL011_t* d            );
-
+void PL011_puts( PL011_t* d, char* str, uint32_t len ) ;
 #endif

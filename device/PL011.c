@@ -47,6 +47,14 @@ void    PL011_putc( PL011_t* d, uint8_t x ) {
   d->DR = x;
 }
 
+void PL011_puts( PL011_t* d, char* str, uint32_t len ) {
+  for( int i = 0 ; (i<len) && str[i] != '\0' &&str[i] != '\n' ; i++ ) {
+    while( d->FR & 0x20 ) {
+      /* wait while transmit FIFO is full */
+    }
+    d->DR = str[i];
+  }
+}
 uint8_t PL011_getc( PL011_t* d            ) {
   while( d->FR & 0x10 ) {
     /* wait while receive FIFO is empty */

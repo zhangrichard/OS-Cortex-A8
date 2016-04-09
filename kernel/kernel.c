@@ -95,34 +95,41 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     case 0x00 : { // read(fd,x,n)
       // scheduler( ctx );
       // break;
-      char cache[500];
+      uint8_t cache[500];
       int   fd = ( int   )( ctx->gpr[ 0 ] ); 
       char*  x = ( char* )( ctx->gpr[ 1 ] );
       int    n = ( int   )( ctx->gpr[ 2 ] );
-      int i = 0;
-      for( int i = 0; i < n; i++ ) {
+
+      int i =0;
+      while(1){
         cache[i] = PL011_getc( UART0 );
-        if(cache[i] == '\r'||i>n){
+        PL011_putc( UART0,cache[i]);
+        if (cache[i]=='\r'||i>n){
+          PL011_putc( UART0,'\n');
+          i++;
+          cache[i] = '\n';
           break;
         }
-        
+        i++;
+      }      
+      for (int j = 0;j<=i;j++){
+        x[j] = cache[j];
       }
-      ctx->gpr[1] = cache[0];
-      ctx->gpr[0] = i;
+      // number add 1
+      ctx->gpr[0] = i+1;
       break;
-    }
+    } 
     case 0x01 : { // write( fd, x, n )
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
       int    n = ( int   )( ctx->gpr[ 2 ] ); 
 
       for( int i = 0; i < n; i++ ) {
-        PL011_putc( UART0, *x++ );
-        if (*x == '\0'){
+        PL011_putc( UART0, *(x+i) );
+        if ( *(x+i) == '\n'){
           break;
         }
       }
-      
       ctx->gpr[ 0 ] = n;
       break;
     }
@@ -160,7 +167,7 @@ void kernel_handler_irq(ctx_t *ctx) {
 
 
   if( id == GIC_SOURCE_TIMER0 ) {
-  scheduler(ctx);
+  // scheduler(ctx);
   TIMER0->Timer1IntClr = 0x01;
   }
 
