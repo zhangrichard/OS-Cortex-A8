@@ -40,20 +40,25 @@ int exit(){
   asm volatile("svc #3 \n");
 }
 // http://stackoverflow.com/questions/12136329/how-does-strcmp-work
-int myStrCmp (const char *s1, const char *s2) {
-    const unsigned char *p1 = (const unsigned char *)s1;
-    const unsigned char *p2 = (const unsigned char *)s2;
+int myStrCmp ( char *s1,  char *s2,int length) {
+    char *p1 = s1;
+    char *p2 = s2;
 
-    while (*p1 != '\0') {
-        if (*p2 == '\0') return  1;
-        if (*p2 > *p1)   return -1;
-        if (*p1 > *p2)   return  1;
-
-        p1++;
-        p2++;
+    for (int i =0;i<length;i++){
+        if(*(p1+i) != *(p2+i))
+        return -1;
     }
-
-    if (*p2 != '\0') return -1;
-
     return 0;
+    // while (*p1 != '\0') {
+    //     if (*p2 == '\0') return  1;
+    //     if (*p2 > *p1)   return -1;
+    //     if (*p1 > *p2)   return  1;
+
+    //     p1++;
+    //     p2++;
+    // }
+
+    // if (*p2 != '\0') return -1;
+
+    // return 0;
 }

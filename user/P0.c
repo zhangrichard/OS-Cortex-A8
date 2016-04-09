@@ -28,8 +28,7 @@ void P0() {
   char   buf[BUF_SIZE];
   int x = 0;
   // fork();
-  char cache[500];
-    // int n =0;
+      // int n =0;
     // while(1){
     //   cache[n] = PL011_getc( UART0 );
     //   if (cache[n]=='\r'){
@@ -41,7 +40,7 @@ void P0() {
     // for( int i = 0; i < n; i++ ) {
     //   PL011_putc( UART0, *x++ );
     // }
-
+  char cache[500];
   char * start = "enter \n";
   char * output = "output is : \n";
  
@@ -53,16 +52,24 @@ void P0() {
     //   sprintf(buf, "is_prime( %d ) = %d\n", x, r );
     //   write(1, buf, strlen(buf));
     // }
+  
+  
   int length;  
   write(1,start,7);
   length= read(0,cache,100);
-  char * string = cache;
-  if (strcmp(string,"fork\r\n") == 0){
-    write(0,"yes\n",4);
+  char * string = &cache[0];
+  if (myStrCmp(string,"fork\r\n",length) == 0){
+    write(0,"forking\n",8);
+    fork();
+  }
+  if (myStrCmp(string,"fork\r\n",length) == 0){
+    write(0,"exiting\n",8);
+    exit();
   }
   write(0,output,13);
   write(0,cache,length);
   // write(1,"\n",1);
+
     
   }
 
