@@ -11,6 +11,6 @@ void yield();
 int read( int fd, void* x, size_t n );
 int write( int fd, void* x, size_t n );
 int fork();
-int exit();
+int exit1();
 int myStrCmp ( char *s1,  char *s2,int length);
 #endif

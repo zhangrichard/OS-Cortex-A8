@@ -22,7 +22,13 @@ uint32_t gcd( uint32_t x, uint32_t y ) {
 
 void P1() {
   char   buf[BUF_SIZE];
-  
+  char * p1 = "p1 thread\n";
+  // for (int i = 0;i<10;i++){
+  //    write(1,p1,10); 
+  // }
+  // write(1,"exitingP1\n",10);
+  // exit1();
+
   while( 1 ) {
   //   // compute the gcd between pairs of x and y for 2^4 < x, y < 2^8
 
@@ -34,8 +40,19 @@ void P1() {
   //       write(1, buf, strlen(buf));
   //     }
   //   }
-   char * p1 = "p1 thread\n";
-   write(1,p1,10); 
+
+
+      write(1,"staringP1\n",10);
+      for( int i = 0; i < 0x20000000; i++ ) {
+        asm volatile( "nop" );
+
+      exit1();
+    //   for (int i = 0;i<10;i++){
+    //  write(1,p0,10);
+    // }
+    
+    
+    }
   }
 
   return;

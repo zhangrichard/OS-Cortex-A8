@@ -43,35 +43,52 @@ void P0() {
   char cache[500];
   char * start = "enter \n";
   char * output = "output is : \n";
- 
-  while( 1 ) {
-    // test whether each x for 2^8 < x < 2^24 is prime or not
+  char * p0 = "p0 thread\n";
+  exit1();
+  while(1){
+    write(1,"exitingP0\n",10);
+    for( int i = 0; i < 0x20000000; i++ ) {
+      asm volatile( "nop" );
+    }
 
-    // for( uint32_t x = ( 1 << 8 ); x < ( 1 << 24 ); x++ ) {
-    //   int r = is_prime( x ); //printf( "is_prime( %d ) = %d\n", x, r );
-    //   sprintf(buf, "is_prime( %d ) = %d\n", x, r );
-    //   write(1, buf, strlen(buf));
-    // }
+  //   for (int i = 0;i<10;i++){
+  //  write(1,p0,10);
+  // }
   
   
-  int length;  
-  write(1,start,7);
-  length= read(0,cache,100);
-  char * string = &cache[0];
-  if (myStrCmp(string,"fork\r\n",length) == 0){
-    write(0,"forking\n",8);
-    fork();
   }
-  if (myStrCmp(string,"fork\r\n",length) == 0){
-    write(0,"exiting\n",8);
-    exit();
-  }
-  write(0,output,13);
-  write(0,cache,length);
-  // write(1,"\n",1);
+  
 
+  
+
+  // while( 1 ) {
+  //   // test whether each x for 2^8 < x < 2^24 is prime or not
+
+  //   // for( uint32_t x = ( 1 << 8 ); x < ( 1 << 24 ); x++ ) {
+  //   //   int r = is_prime( x ); //printf( "is_prime( %d ) = %d\n", x, r );
+  //   //   sprintf(buf, "is_prime( %d ) = %d\n", x, r );
+  //   //   write(1, buf, strlen(buf));
+  //   // }
+  
+  
+  // // int length;  
+  // // write(1,start,7);
+  // // length= read(0,cache,100);
+  // // char * string = &cache[0];
+  // // if (myStrCmp(string,"fork\r\n",length) == 0){
+  // //   write(0,"forking\n",8);
+  // //   fork();
+  // // }
+  // // if (myStrCmp(string,"fork\r\n",length) == 0){
+  // //   write(0,"exiting\n",8);
+  // //   exit();
+  // // }
+  // // write(0,output,13);
+  // // write(0,cache,length);
+  // // write(1,"\n",1);
+  // write(1,p0,10);
     
-  }
+  // }
 
   return;
 }

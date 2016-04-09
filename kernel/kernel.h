@@ -7,7 +7,7 @@
 #include   "GIC.h"
 #include "PL011.h"
 #include "SP804.h"
-#include "../device/PL011.h"
+
 #include "interrupt.h"
 
 
@@ -15,11 +15,14 @@
 #include "P0.h"
 #include "P1.h"
 #include "P2.h"
+
+
+// #include <stdlib.h>
 //https://www3.cs.stonybrook.edu/~skiena/392/programs/queue.h
-// #include "queue.h"
+ #include "queue.h"
 	
 typedef struct {
-  uint32_t cpsr, pc, gpr[ 13 ], sp, lr;
+  uint32_t cpsr, pc, gpr[ 13 ], sp, lr, priority;
 } ctx_t;
 
 typedef int pid_t;

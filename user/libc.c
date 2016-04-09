@@ -36,7 +36,7 @@ int fork(){
                 );
   return r;
 }
-int exit(){
+int exit1(){
   asm volatile("svc #3 \n");
 }
 // http://stackoverflow.com/questions/12136329/how-does-strcmp-work
