@@ -1,5 +1,5 @@
   #include "kernel.h"
-// #include <stdio.h>
+#include <stdio.h>
 // #include <stdlib.h>
 // #include "queue.h"
 #include "string.h"
@@ -16,10 +16,10 @@
 
 
 pcb_t pcb[ PCB_SIZE ], *current = NULL;
-static int numberOfProcess =3;
+static int numberOfProcess =4;
 heap_t h[1];
 heap_t *m;
-pid_t nextpid =3;
+pid_t nextpid =4;
 
 // base on the priority to schedule process
 void priorityBaseScheduler( ctx_t* ctx ) {
@@ -64,8 +64,7 @@ void kernel_handler_rst( ctx_t* ctx              ) {
    *   mode, with IRQ interrupts enabled, and
    * - the PC and SP values matche the entry point and top of stack. 
    */
-
-  write(1,"initialising\n",13);
+   printf("%s\n","initialising" );
   UART0->IMSC           |= 0x00000010; // enable UART    (Rx) interrupt
   UART0->CR              = 0x00000301; // enable UART (Tx+Rx)
   TIMER0->Timer1Load     = 0x00100000; // select period = 2^20 ticks ~= 1 sec
@@ -86,7 +85,7 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   pcb[ 0 ].ctx.cpsr = 0x50;
   pcb[ 0 ].ctx.pc   = ( uint32_t )( entry_P0 );
   pcb[ 0 ].ctx.sp   = ( uint32_t )(  &tos_user );
-  pcb[ 0 ].ctx.priority = 10;
+  pcb[ 0 ].ctx.priority = 1;
   memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );
   pcb[ 1 ].pid      = 1;
   pcb[ 1 ].ctx.cpsr = 0x50;
@@ -99,6 +98,12 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   pcb[ 2 ].ctx.pc   = ( uint32_t )( entry_P2 );
   pcb[ 2 ].ctx.sp   = ( uint32_t )(  &(tos_user)+2000  );
   pcb[ 2 ].ctx.priority = 2;
+  memset( &pcb[ 3 ], 0, sizeof( pcb_t ) );
+  pcb[ 3 ].pid      = 0;
+  pcb[ 3 ].ctx.cpsr = 0x50;
+  pcb[ 3 ].ctx.pc   = ( uint32_t )( entry_shell);
+  pcb[ 3 ].ctx.sp   = ( uint32_t )(  &(tos_user)+3000 );
+  pcb[ 3 ].ctx.priority = 10;
   /* Once the PCBs are initialised, we (arbitrarily) select one to be
    * restored (i.e., executed) when the function then returns.
    */

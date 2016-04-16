@@ -4,7 +4,7 @@
 // void yield() {
 //   // asm volatile( "svc #0     \n"  );
 // }
-int read( int fd, void* x, size_t n ) {
+int _read( int fd, void* x, size_t n ) {
   int r;
   asm volatile( "mov r0, %1 \n"
               "mov r1, %2 \n"
@@ -16,7 +16,7 @@ int read( int fd, void* x, size_t n ) {
             : "r0", "r1", "r2" );
   return r;
 }
-int write( int fd, void* x, size_t n ) {
+int _write( int fd, void* x, size_t n ) {
   int r;
 
   asm volatile( "mov r0, %1 \n"
@@ -56,64 +56,36 @@ int exit1(int pid){
 // int exit1(){
 //   asm volatile("svc #3 \n");
 // }
-// http://stackoverflow.com/questions/12136329/how-does-strcmp-work
-int myStrCmp ( char *s1,  char *s2,int length) {
-    char *p1 = s1;
-    char *p2 = s2;
 
-    for (int i =0;i<length;i++){
-        if(*(p1+i) != *(p2+i))
-        return -1;
-    }
-    return 0;
-    // while (*p1 != '\0') {
-    //     if (*p2 == '\0') return  1;
-    //     if (*p2 > *p1)   return -1;
-    //     if (*p1 > *p2)   return  1;
+int _close(int file) { return -1; }
 
-    //     p1++;
-    //     p2++;
-    // }
-
-    // if (*p2 != '\0') return -1;
-
-    // return 0;
+int _fstat(int file, struct stat *st) {
+ st->st_mode = S_IFCHR;
+ return 0;
 }
 
-void printm(char *str,...)
-{
-    int total,arg1;
-    float arg2;
-    char token,*arg3;
-    va_list ap;
-    va_start(ap,str);
-    while(*str!='\0')
-    {
-  if(*str=='%')
-  {
-      token=*(++str);
-      switch(token)
-      {
-    case 'd':
-    arg1=va_arg(ap,int);
-    printf("%d",arg1);
-    break;
- 
-    case '%':
-    putchar(token);
-    break;
- 
-    case 's':
-    printf("%s",va_arg(ap,char *));
-    break;
- 
-    case 'f':
-    printf("%f",va_arg(ap,double));
-    break;
-      }
-  }
-  else
-  putchar(*str);
-  str++;
-    }
-}
+int _isatty(int file) { return 1; }
+
+int _lseek(int file, int ptr, int dir) { return 0; }
+
+int _open(const char *name, int flags, int mode) { return -1; }
+
+char *heap_end = 0;
+caddr_t _sbrk(int incr) {
+ extern char heap_low; /* Defined by the linker */
+ extern char heap_top; /* Defined by the linker */
+ char *prev_heap_end;
+
+ if (heap_end == 0) {
+  heap_end = &heap_low;
+ }
+ prev_heap_end = heap_end;
+
+ if (heap_end + incr > &heap_top) {
+  /* Heap and stack collision */
+  return (caddr_t)0;
+ }
+
+ heap_end += incr;
+ return (caddr_t) prev_heap_end;
+ }

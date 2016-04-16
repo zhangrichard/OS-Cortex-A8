@@ -15,7 +15,10 @@ SECTIONS {
   /* allocate stack for svc mode */
   .       = . + 0x00001000;        
   tos_svc = .;
-
+   
+   heap_low = .;
+   . += 0x10000;
+   heap_top = .;
 
   /* allocate stack for user process   8 users   */
 
