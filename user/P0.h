@@ -1,9 +1,7 @@
 #ifndef __P0_H
 #define __P0_H
 
-#include <stdio.h>
-#include  <string.h>
-#include  <sys/types.h>
+
 #include <stddef.h>
 #include <stdint.h>
 

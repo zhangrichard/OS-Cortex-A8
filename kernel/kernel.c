@@ -1,7 +1,8 @@
   #include "kernel.h"
-#include <stdio.h>
-#include <stdlib.h>
+// #include <stdio.h>
+// #include <stdlib.h>
 // #include "queue.h"
+#include "string.h"
 
 /* Since we *know* there will be 2 processes, stemming from the 2 user 
  * programs, we can 
@@ -171,19 +172,22 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       ctx->gpr[ 0 ] = n;
       break;
     }
-    case 0x02:{ //fork(pidNum)
+    case 0x02:{ //fork(pidNum)  can only fork process one two three
       //intinital new process in process block
       int   pidNum = ( int   )( ctx->gpr[ 0 ] ); 
-      memset( &pcb[ numberOfProcess ], 0, sizeof( pcb_t ) );
+      // create new process blockt
+      int currentProcess = numberOfProcess;
+      memset( &pcb[ currentProcess ], 0, sizeof( pcb_t ) );
       // parent =kid pid
       pcb[pidNum-1].pid =   
-      pcb[ numberOfProcess ].pid      = nextpid++;       
-      numberOfProcess++; 
+      pcb[ currentProcess ].pid      = nextpid++;       
+      
       // copy parent to child
-      memcpy( &pcb[ numberOfProcess ].ctx, &pcb[pidNum].ctx, sizeof( ctx_t ) );
-      pcb[ 2 ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000  );
+      memcpy( &pcb[ currentProcess ].ctx, &pcb[pidNum].ctx, sizeof( ctx_t ) );
+      pcb[ currentProcess ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000*currentProcess  );
       
       ctx->gpr[0]= pcb[ numberOfProcess ].pid;
+      numberOfProcess++;
       break;
     }
     case 0x03:{ //exit(pidNum)
@@ -200,8 +204,9 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
         memcpy(pointer,(pointer+1),sizeof(pcb_t));
         pointer++;
       }
-      numberOfProcess--;
+      
       scheduler(ctx);
+      numberOfProcess--;
       // *current->pid = 0;
       // *current->ctx.cpsr = 0;
       // *current->ctx.cpsr = 0;

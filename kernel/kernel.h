@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
+// #include <stdio.h>
 #include   "GIC.h"
 #include "PL011.h"
 #include "SP804.h"

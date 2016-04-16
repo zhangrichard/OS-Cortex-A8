@@ -111,6 +111,7 @@ void P0() {
   //   // }
   
   while(1){
+  
      int length;  
   write(1,start,7);
   length= read(0,cache,100);
