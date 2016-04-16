@@ -1,9 +1,12 @@
 #ifndef __P1_H
 #define __P1_H
 
-
 #include <stddef.h>
 #include <stdint.h>
+#include  <string.h>
+
+#include <stdio.h>
+
 
 #include "libc.h"
 #define   BUF_SIZE   100

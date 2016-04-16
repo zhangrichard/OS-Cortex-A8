@@ -114,27 +114,27 @@ void P0() {
   
      int length;  
   write(1,start,7);
-  length= read(0,cache,100);
+  length= read(1,cache,100);
   char * string = &cache[0];
   // write(0,string,10);
   int count =   tokenize(cache,length,args);
   
   if (strcmp(args[0],"fork") == 0){ 
-    write(0,"forking\n",8);
+    write(1,"forking\n",8);
     int pid = atoi(args[1]);
     fork(pid);
     // fork();
   }
 
   if (strcmp(string,"exit\r\n") == 0){
-    write(0,"exiting\n",8);
+    write(1,"exiting\n",8);
     // exit();
     int pid = atoi(args[1]);
     exit1(pid);
   }
   // write(0,output,13);
   // write(0,cache,length);
-  write(0,"\n",1);
+  write(1,"\n",1);
   for( int i = 0; i < 0x20000000; i++ ) {
         asm volatile( "nop" );
       } 

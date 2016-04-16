@@ -4,7 +4,9 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
+// #include <stdlib.h>
+#include <stdio.h>
+#include  <string.h>
 #include "libc.h"
 #define   BUF_SIZE   100
 typedef char  buffer_t  [500];

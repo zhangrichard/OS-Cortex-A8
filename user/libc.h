@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
+#include <sys/stat.h>
 // cooperatively yield control of processor, i.e., invoke the scheduler
 void yield();
 
@@ -13,4 +13,5 @@ int write( int fd, void* x, size_t n );
 int fork();
 int exit1();
 int myStrCmp ( char *s1,  char *s2,int length);
+void printm(char *str,...);
 #endif

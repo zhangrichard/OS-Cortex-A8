@@ -65,7 +65,7 @@ void kernel_handler_rst( ctx_t* ctx              ) {
    * - the PC and SP values matche the entry point and top of stack. 
    */
 
-  write(0,"initialising\n",13);
+  write(1,"initialising\n",13);
   UART0->IMSC           |= 0x00000010; // enable UART    (Rx) interrupt
   UART0->CR              = 0x00000301; // enable UART (Tx+Rx)
   TIMER0->Timer1Load     = 0x00100000; // select period = 2^20 ticks ~= 1 sec
@@ -108,6 +108,7 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   // m = (heap_t *) malloc(sizeof(heap_t));
   // m->len =0;
   // free(m);
+   // initiallize queue
   h->len=0;
 
   for (int index = 0;index<numberOfProcess;index++){
@@ -185,6 +186,9 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       // copy parent to child
       memcpy( &pcb[ currentProcess ].ctx, &pcb[pidNum].ctx, sizeof( ctx_t ) );
       pcb[ currentProcess ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000*currentProcess  );
+
+      // push queue
+      push(h,pcb[currentProcess].ctx.priority,currentProcess);
       
       ctx->gpr[0]= pcb[ numberOfProcess ].pid;
       numberOfProcess++;

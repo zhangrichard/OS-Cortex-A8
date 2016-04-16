@@ -21,12 +21,13 @@ void P2() {
   // fork();
   while(1){
   for (int i =0;i<10;i++){
-      write(0,"staringP2\n",10);
+      write(1,"staringP2\n",10);
     }
+    write(1,"endP2\n",6);
       // for( int i = 0; i < 0x20000000; i++ ) {
       //   asm volatile( "nop" );
 
-      exit1(2);
+      // exit1(2);
     // }
   for( int i = 0; i < 0x20000000; i++ ) {
         asm volatile( "nop" );

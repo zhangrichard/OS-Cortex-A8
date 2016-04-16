@@ -1,4 +1,6 @@
 #include "libc.h"
+#include<stdio.h>
+#include<stdarg.h>
 // void yield() {
 //   // asm volatile( "svc #0     \n"  );
 // }
@@ -76,4 +78,42 @@ int myStrCmp ( char *s1,  char *s2,int length) {
     // if (*p2 != '\0') return -1;
 
     // return 0;
+}
+
+void printm(char *str,...)
+{
+    int total,arg1;
+    float arg2;
+    char token,*arg3;
+    va_list ap;
+    va_start(ap,str);
+    while(*str!='\0')
+    {
+  if(*str=='%')
+  {
+      token=*(++str);
+      switch(token)
+      {
+    case 'd':
+    arg1=va_arg(ap,int);
+    printf("%d",arg1);
+    break;
+ 
+    case '%':
+    putchar(token);
+    break;
+ 
+    case 's':
+    printf("%s",va_arg(ap,char *));
+    break;
+ 
+    case 'f':
+    printf("%f",va_arg(ap,double));
+    break;
+      }
+  }
+  else
+  putchar(*str);
+  str++;
+    }
 }
