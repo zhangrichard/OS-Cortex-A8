@@ -15,14 +15,13 @@ SECTIONS {
   /* allocate stack for svc mode */
   .       = . + 0x00001000;        
   tos_svc = .;
+
+
+  /* allocate stack for user process   8 users   */
+
   /* allocate stack for P0       */
-  .       = . + 0x00001000;  
-  tos_P0  = .;
-  /* allocate stack for P1       */
-  .       = . + 0x00001000;  
-  tos_P1  = .;
-    /* allocate stack for P1       */
-  .       = . + 0x00001000;  
-  tos_P2  = .;
+  .       = . + 0x001000;  
+  tos_user  = .;
+
   PROVIDE (end = .);
 }

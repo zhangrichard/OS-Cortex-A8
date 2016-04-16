@@ -29,16 +29,31 @@ int write( int fd, void* x, size_t n ) {
   return r;
 }
 
-int fork(){
+int fork(int pid){
   int r;
-  asm volatile("svc #2 \n"
+  asm volatile( "mov r0, %1 \n"
+                "svc #2 \n"
+                "mov %0,r0 \n"
                 :"=r"(r)
-                );
+                :"r" (pid) 
+                : "r0" );
+                
   return r;
 }
-int exit1(){
-  asm volatile("svc #3 \n");
+int exit1(int pid){
+  int r;
+  asm volatile( "mov r0, %1 \n"
+                "svc #3 \n"
+                "mov %0,r0 \n"
+                :"=r"(r)
+                :"r" (pid) 
+                : "r0" );
+               
+  return r;
 }
+// int exit1(){
+//   asm volatile("svc #3 \n");
+// }
 // http://stackoverflow.com/questions/12136329/how-does-strcmp-work
 int myStrCmp ( char *s1,  char *s2,int length) {
     char *p1 = s1;

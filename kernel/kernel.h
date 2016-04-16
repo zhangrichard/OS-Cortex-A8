@@ -21,6 +21,8 @@
 //https://www3.cs.stonybrook.edu/~skiena/392/programs/queue.h
  #include "queue.h"
 	
+extern uint32_t tos_user;
+
 typedef struct {
   uint32_t cpsr, pc, gpr[ 13 ], sp, lr, priority;
 } ctx_t;
@@ -31,7 +33,10 @@ typedef struct {
   pid_t pid;
   ctx_t ctx;
 } pcb_t;
+// typedef struct {
+// 	pcb_t pc
+// }
 
-#define PCB_SIZE 10
+#define PCB_SIZE 100
 
 #endif

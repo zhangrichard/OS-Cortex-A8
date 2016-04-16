@@ -19,13 +19,19 @@ uint32_t weight( uint32_t x ) {
 void P2() {
   char   buf[BUF_SIZE];
   // fork();
-  char * p1 = "p2 thread\n";
-  for (int i = 0;i<10;i++){
-     write(1,p1,10); 
-  }
-  write(1,"exitingP2\n",10);
-  exit1();
+  while(1){
+  for (int i =0;i<10;i++){
+      write(0,"staringP2\n",10);
+    }
+      // for( int i = 0; i < 0x20000000; i++ ) {
+      //   asm volatile( "nop" );
 
+      exit1(2);
+    // }
+  for( int i = 0; i < 0x20000000; i++ ) {
+        asm volatile( "nop" );
+      } 
+  
   // while( 1 ) {
   //   // compute the Hamming weight of each x for 2^8 < x < 2^24
 
@@ -37,7 +43,7 @@ void P2() {
   //    char * p1 = "p2 thread\n";
   //  write(1,p1,10); 
   // }
-
+    }
   return;
 }
 void (*entry_P2)() = &P2;
