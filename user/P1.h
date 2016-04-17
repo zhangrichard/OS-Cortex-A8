@@ -3,9 +3,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include  <string.h>
 
-#include <stdio.h>
+
 
 
 #include "libc.h"

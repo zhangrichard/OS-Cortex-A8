@@ -13,31 +13,14 @@ uint32_t gcd( uint32_t x, uint32_t y ) {
     return gcd( x, y - x );
   }
 }
-// combine task3
-// void P1() {
-//   char* x = "hello world, I'm P1\n";
 
-//   while( 1 ) {
-//     write( 0, x, 20 ); //yield();
-//   }
-// }
 
 void P1() {
   char   buf[BUF_SIZE];
   char * p1 = "p1 thread\n";
-  // for (int i = 0;i<10;i++){
-  //    write(1,p1,10); 
-  // }
-  // write(1,"exitingP1\n",10);
-  // exit1();
 
   while( 1 ) {
-  //   // compute the gcd between pairs of x and y for 2^4 < x, y < 2^8
-    // for (int i =0;i<10;i++){
-    //   _write(1,"staringP1\n",10);
-    // }
-    // _write(1,"endP1\n",6);
-    
+ 
     for( uint32_t x = ( 1 << 4 ); x < ( 1 << 4); x++ ) {
       for( uint32_t y = ( 1 << 4 ); y < ( 1 << 4 ); y++ ) {
         uint32_t r = gcd( x, y );  
@@ -50,24 +33,7 @@ void P1() {
       } 
     }
     
-    
-
-    // exit1();
-    // write(1,"staringP1\n",10);
-    //   for (int i =0;i<10;i++){
-    //     write(1,i,10);
-    //   }
-
-      // write(1,"staringP1\n",10);
-      // for( int i = 0; i < 0x20000000; i++ ) {
-      //   asm volatile( "nop" );
-      // }
-      // exit1();
-    //   for (int i = 0;i<10;i++){
-    //  write(1,p0,10);
-    // }
-    
-    
+  
     
   }
 

@@ -1,6 +1,6 @@
   #include "kernel.h"
 #include <stdio.h>
-// #include <stdlib.h>
+#include <stdlib.h>
 // #include "queue.h"
 #include "string.h"
 
@@ -17,9 +17,10 @@
 
 pcb_t pcb[ PCB_SIZE ], *current = NULL;
 static int numberOfProcess =4;
-heap_t h[1];
-heap_t *m;
+heap_t *h = NULL;
+// heap_t *m;
 pid_t nextpid =4;
+
 
 // base on the priority to schedule process
 void priorityBaseScheduler( ctx_t* ctx ) {
@@ -86,18 +87,19 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   pcb[ 0 ].ctx.pc   = ( uint32_t )( entry_P0 );
   pcb[ 0 ].ctx.sp   = ( uint32_t )(  &tos_user );
   pcb[ 0 ].ctx.priority = 1;
-  memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );
-  pcb[ 1 ].pid      = 1;
-  pcb[ 1 ].ctx.cpsr = 0x50;
-  pcb[ 1 ].ctx.pc   = ( uint32_t )( entry_P1 );
-  pcb[ 1 ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000 );
-  pcb[ 1 ].ctx.priority = 5;
+  
   memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );
   pcb[ 2 ].pid      = 2;
   pcb[ 2 ].ctx.cpsr = 0x50;
   pcb[ 2 ].ctx.pc   = ( uint32_t )( entry_P2 );
   pcb[ 2 ].ctx.sp   = ( uint32_t )(  &(tos_user)+2000  );
   pcb[ 2 ].ctx.priority = 2;
+  memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );
+  pcb[ 1 ].pid      = 1;
+  pcb[ 1 ].ctx.cpsr = 0x50;
+  pcb[ 1 ].ctx.pc   = ( uint32_t )( entry_P1 );
+  pcb[ 1 ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000 );
+  pcb[ 1 ].ctx.priority = 5;
   memset( &pcb[ 3 ], 0, sizeof( pcb_t ) );
   pcb[ 3 ].pid      = 0;
   pcb[ 3 ].ctx.cpsr = 0x50;
@@ -114,8 +116,9 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   // m->len =0;
   // free(m);
    // initiallize queue
-  h->len=0;
-
+  // h->len=0;
+   int indexPop = 0;
+   h= calloc(1, sizeof (heap_t));
   for (int index = 0;index<numberOfProcess;index++){
     push(h,pcb[index].ctx.priority,index);
   }

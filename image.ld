@@ -23,7 +23,7 @@ SECTIONS {
   /* allocate stack for user process   8 users   */
 
   /* allocate stack for P0       */
-  .       = . + 0x001000;  
+  .       = . + 0x10000;  
   tos_user  = .;
 
   PROVIDE (end = .);
