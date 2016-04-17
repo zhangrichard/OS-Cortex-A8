@@ -28,7 +28,10 @@ void priorityBaseScheduler( ctx_t* ctx ) {
   
   //pop heap to get the index
   int index = pop(h);
+  // printf("at position ready queue%d",(indexPop%h->len));
+
   memcpy(&current->ctx, ctx, sizeof(ctx_t));
+
   memcpy(ctx,&pcb[index].ctx, sizeof(ctx_t));
   current = &pcb[index];
 
@@ -93,6 +96,7 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   pcb[ 1 ].ctx.pc   = ( uint32_t )( entry_P1 );
   pcb[ 1 ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000 );
   pcb[ 1 ].ctx.priority = 5;
+  
   memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );
   pcb[ 2 ].pid      = 2;
   pcb[ 2 ].ctx.cpsr = 0x50;
@@ -101,11 +105,11 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   pcb[ 2 ].ctx.priority = 2;
   
   memset( &pcb[ 3 ], 0, sizeof( pcb_t ) );
-  pcb[ 3 ].pid      = 3;
+  pcb[ 3 ].pid      = 0;
   pcb[ 3 ].ctx.cpsr = 0x50;
   pcb[ 3 ].ctx.pc   = ( uint32_t )( entry_shell);
   pcb[ 3 ].ctx.sp   = ( uint32_t )(  &(tos_user)+3000 );
-  pcb[ 3 ].ctx.priority = 10;
+  pcb[ 3 ].ctx.priority = 0;
   /* Once the PCBs are initialised, we (arbitrarily) select one to be
    * restored (i.e., executed) when the function then returns.
    */
@@ -123,7 +127,9 @@ void kernel_handler_rst( ctx_t* ctx              ) {
     push(h,pcb[index].ctx.priority,index);
   }
   int index = pop(h);
-  current = &pcb[ index ]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
+   
+  //start from shell
+  current = &pcb[index]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
   irq_enable();
 
   return;
@@ -184,11 +190,11 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     case 0x02:{ //fork(pidNum)  can only fork process one two three
       //intinital new process in process block
       int   pidNum = ( int   )( ctx->gpr[ 0 ] ); 
-      // create new process blockt
+      // create new process block and to end of block queue
       int currentProcess = numberOfProcess;
       memset( &pcb[ currentProcess ], 0, sizeof( pcb_t ) );
       // parent =kid pid
-      pcb[pidNum-1].pid =   
+      // pcb[pidNum-1].pid =   
       pcb[ currentProcess ].pid      = nextpid++;       
       
       // copy parent to child
@@ -196,30 +202,28 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       pcb[ currentProcess ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000*currentProcess  );
 
       // push queue
-      push(h,pcb[currentProcess].ctx.priority,currentProcess);
+      push(h,pcb[currentProcess].ctx.priority,pidNum);
       
       ctx->gpr[0]= pcb[ numberOfProcess ].pid;
       numberOfProcess++;
       break;
     }
     case 0x03:{ //exit(pidNum)
-      // empty the pcb content
-      // free(current);
-      int   pidNum = ( int   )( ctx->gpr[ 0 ] ); 
-      memset( current, 0, sizeof( pcb_t ) );
-      // current == &pcb[ 1 ];
-      memset( &current->ctx,0, sizeof(ctx_t));
-      pcb_t *pointer = &pcb[ pidNum ];
+   
+      int   pidNum = ( int   )( ctx->gpr[ 0 ] );    
       // pcb_t temp;
-      // fill the gap in pcb block
-      while(pointer !=&pcb[numberOfProcess-1]){
-        memcpy(pointer,(pointer+1),sizeof(pcb_t));
-        pointer++;
-      }
-      memset( pointer,0, sizeof(pcb_t));
-      scheduler(ctx);
-      numberOfProcess--;
+      // fill the gap in pcb block queue
+      // pcb_t *pointer = &pcb[ pidNum ];
+      // while(pointer !=&pcb[numberOfProcess-1]){
+      //   memcpy(pointer,(pointer+1),sizeof(pcb_t));
+      //   pointer++;
+      // }
 
+      // memset( pointer,0, sizeof(pcb_t));
+      exitQueue(h,pidNum);
+      // priorityBaseScheduler(ctx);
+      // numberOfProcess--;
+      ctx->gpr[0]= pidNum;
       break;
     }
     default   : { // unknown
@@ -238,7 +242,7 @@ void kernel_handler_irq(ctx_t *ctx) {
 
 
   if( id == GIC_SOURCE_TIMER0 ) {
-  scheduler(ctx);  
+  priorityBaseScheduler(ctx);  
   TIMER0->Timer1IntClr = 0x01;
   }
 

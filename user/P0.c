@@ -42,11 +42,11 @@ void P0() {
     // for( int i = 0; i < n; i++ ) {
     //   PL011_putc( UART0, *x++ );
     // }
-  args_t args;
-  buffer_t cache;
-  char * start = "enter \n";
-  char * output = "output is : \n";
-  char * p0 = "p0 thread\n";
+  // args_t args;
+  // buffer_t cache;
+  // char * start = "enter \n";
+  // char * output = "output is : \n";
+  // char * p0 = "p0 thread\n";
   // exit1();
   // while(1){
   //   write(1,"exitingP0\n",10);
@@ -76,7 +76,7 @@ void P0() {
       printf( "is_prime( %d ) = %d\n", x, r );
       // sprintf(buf, "is_prime( %d ) = %d\n", x, r );
       // write(1, buf, strlen(buf));
-      for( int i = 0; i < 0x20000000; i++ ) {
+      for( int i = 0; i < 0x05000000; i++ ) {
         asm volatile( "nop" );
       } 
     }

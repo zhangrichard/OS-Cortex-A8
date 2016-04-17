@@ -20,7 +20,7 @@ void P1() {
       for( uint32_t y = ( 1 << 4 ); y < ( 1 << 8 ); y++ ) {
         uint32_t r = gcd( x, y );  // 
         printf( "gcd( %d, %d ) = %d\n", x, y, r );
-        for( int i = 0; i < 0x20000000; i++ ) {
+        for( int i = 0; i < 0x05000000; i++ ) {
           asm volatile( "nop" );
         }
       }

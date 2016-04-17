@@ -35,7 +35,7 @@ void P2() {
     for( uint32_t x = ( 1 << 8 ); x < ( 1 << 24 ); x++ ) {
       uint32_t r = weight( x ); // 
       printf( "weight( %d ) = %d\n", x, r );
-      for( int i = 0; i < 0x20000000; i++ ) {
+      for( int i = 0; i < 0x05000000; i++ ) {
         asm volatile( "nop" );
       } 
     }

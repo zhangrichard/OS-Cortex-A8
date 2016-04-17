@@ -1,5 +1,7 @@
 #include "queue.h"
 #include <stdlib.h>
+#include<stdio.h>
+#include "string.h"
 int indexPop = 0;
 // void queue_init(heap_t *h){
     
@@ -21,32 +23,30 @@ void push (heap_t *h, int priority, int index) {
     h->len++;
 }
 
-
- 
 int pop (heap_t *h) {
     if (!h->len) {
         return 0;
     }
     int pos = (indexPop % (h->len))+1;
+    // printf("at position ready queue%d\n",(indexPop % (h->len))+1);
     int index = h->nodes[pos].index;
     indexPop++;
+    
     return index;
 } 
 
 void exitQueue(heap_t *h,int index){
-    // node_t * p = h->nodes[index+1];
     int pos;
-    for (int i =0;i<h->len;i++){
+    for (int i =1;i<=h->len;i++){
          if (h->nodes[i].index == index){
             pos = i;
          }
     }
     for (int i = pos;i<h->len;i++){
-        h->nodes[i]= h->nodes[i+1];
+        memcpy(&h->nodes[i],&h->nodes[i+1],sizeof(node_t));
     }
-    
-    // free(h->nodes[index]);
+    memset(&h->nodes[h->len],0,sizeof(node_t));
     h->len--;
-
+    indexPop = 0;
     // h->nodes[index+1];
 }

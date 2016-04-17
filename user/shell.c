@@ -54,7 +54,7 @@ void shell() {
   int x = 0;
   args_t args;
   buffer_t cache;
-  char * start = "enter \n";
+  char * start = "enter";
   char * output = "output is : \n";
   char * p0 = "p0 thread\n";
 
@@ -84,8 +84,8 @@ void shell() {
   }
   // write(0,output,13);
   // write(0,cache,length);
-  _write(1,"\n",1);
-  for( int i = 0; i < 0x20000000; i++ ) {
+  
+  for( int i = 0; i < 0x05000000; i++ ) {
         asm volatile( "nop" );
       } 
   }
