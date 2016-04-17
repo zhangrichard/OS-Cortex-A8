@@ -47,7 +47,7 @@ void scheduler( ctx_t* ctx ) {
   }
   // else if ( current == &pcb[ 1 ] ) {
   //   memcpy( &pcb[ 1 ].ctx, ctx, sizeof( ctx_t ) );
-  //   memcpy( ctx, &pcb[ 2].ctx, sizeof( ctx_t ) );
+  // n  memcpy( ctx, &pcb[ 2].ctx, sizeof( ctx_t ) );
   //   current = &pcb[ 2 ];
   // }
   // else if ( current == &pcb[ 2 ] ) {
@@ -87,21 +87,21 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   pcb[ 0 ].ctx.pc   = ( uint32_t )( entry_P0 );
   pcb[ 0 ].ctx.sp   = ( uint32_t )(  &tos_user );
   pcb[ 0 ].ctx.priority = 1;
-  
-  memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );
-  pcb[ 2 ].pid      = 2;
-  pcb[ 2 ].ctx.cpsr = 0x50;
-  pcb[ 2 ].ctx.pc   = ( uint32_t )( entry_P2 );
-  pcb[ 2 ].ctx.sp   = ( uint32_t )(  &(tos_user)+2000  );
-  pcb[ 2 ].ctx.priority = 2;
   memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );
   pcb[ 1 ].pid      = 1;
   pcb[ 1 ].ctx.cpsr = 0x50;
   pcb[ 1 ].ctx.pc   = ( uint32_t )( entry_P1 );
   pcb[ 1 ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000 );
   pcb[ 1 ].ctx.priority = 5;
+  memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );
+  pcb[ 2 ].pid      = 2;
+  pcb[ 2 ].ctx.cpsr = 0x50;
+  pcb[ 2 ].ctx.pc   = ( uint32_t )( entry_P2 );
+  pcb[ 2 ].ctx.sp   = ( uint32_t )(  &(tos_user)+2000  );
+  pcb[ 2 ].ctx.priority = 2;
+  
   memset( &pcb[ 3 ], 0, sizeof( pcb_t ) );
-  pcb[ 3 ].pid      = 0;
+  pcb[ 3 ].pid      = 3;
   pcb[ 3 ].ctx.cpsr = 0x50;
   pcb[ 3 ].ctx.pc   = ( uint32_t )( entry_shell);
   pcb[ 3 ].ctx.sp   = ( uint32_t )(  &(tos_user)+3000 );
@@ -216,21 +216,10 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
         memcpy(pointer,(pointer+1),sizeof(pcb_t));
         pointer++;
       }
-      
+      memset( pointer,0, sizeof(pcb_t));
       scheduler(ctx);
       numberOfProcess--;
-      // *current->pid = 0;
-      // *current->ctx.cpsr = 0;
-      // *current->ctx.cpsr = 0;
-      // *current->ctx.cpsr = 0;
-      // pcb[ 2 ].ctx.pc   = 0;
-      // pcb[ 2 ].ctx.sp   = 0;
-      // if      ( current == &pcb[ 0 ] )
-      // pcb[ 2 ].pid      = 0;
-      // pcb[ 2 ].ctx.cpsr = 0;
-      // pcb[ 2 ].ctx.pc   = 0;
-      // pcb[ 2 ].ctx.sp   = 0;
-      // priorityBaseScheduler(ctx);
+
       break;
     }
     default   : { // unknown

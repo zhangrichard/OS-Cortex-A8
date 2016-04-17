@@ -1,7 +1,5 @@
 #include "P1.h"
-#include <stdlib.h>
 #include <stdio.h>
-#include  <string.h>
 uint32_t gcd( uint32_t x, uint32_t y ) {
   if     ( x == y ) {
     return x;
@@ -14,29 +12,24 @@ uint32_t gcd( uint32_t x, uint32_t y ) {
   }
 }
 
-
 void P1() {
-  char   buf[BUF_SIZE];
-  char * p1 = "p1 thread\n";
-
   while( 1 ) {
- 
-    for( uint32_t x = ( 1 << 4 ); x < ( 1 << 4); x++ ) {
-      for( uint32_t y = ( 1 << 4 ); y < ( 1 << 4 ); y++ ) {
-        uint32_t r = gcd( x, y );  
-        // printm( "gcd( %d, %d ) = %d\n", x, y, r );
+    // compute the gcd between pairs of x and y for 2^4 < x, y < 2^8
+
+    for( uint32_t x = ( 1 << 4 ); x < ( 1 << 8 ); x++ ) {
+      for( uint32_t y = ( 1 << 4 ); y < ( 1 << 8 ); y++ ) {
+        uint32_t r = gcd( x, y );  // 
         printf( "gcd( %d, %d ) = %d\n", x, y, r );
-        
+        for( int i = 0; i < 0x20000000; i++ ) {
+          asm volatile( "nop" );
+        }
       }
-      for( int i = 0; i < 0x20000000; i++ ) {
-        asm volatile( "nop" );
-      } 
+      // wait little bit longer
+      
     }
-    
-  
     
   }
 
   return;
 }
-void(*entry_P1)() =&P1;
+void (*entry_P1)() = &P1;

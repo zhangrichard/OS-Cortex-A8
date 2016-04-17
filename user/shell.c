@@ -1,4 +1,4 @@
-#include "P0.h"
+#include "shell.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include  <string.h>
@@ -63,21 +63,21 @@ void shell() {
   while(1){
   printf("%s\n","starting command shell" );
      int length;  
-  _write(1,start,7);
+  printf("%s\n",start );
   length= _read(1,cache,100);
   char * string = &cache[0];
   // write(0,string,10);
   int count =   tokenize(cache,length,args);
   
   if (strcmp(args[0],"fork") == 0){ 
-    _write(1,"forking\n",8);
+    printf("%s\n","forking" );
     int pid = atoi(args[1]);
     fork(pid);
     // fork();
   }
 
-  if (strcmp(string,"exit\r\n") == 0){
-    _write(1,"exiting\n",8);
+  if (strcmp(string,"exit") == 0){
+    printf("%s\n","exiting ");
     // exit();
     int pid = atoi(args[1]);
     exit1(pid);
