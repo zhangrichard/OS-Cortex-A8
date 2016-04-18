@@ -23,7 +23,7 @@ int load();
 int store(int data);
 bool registerInterest();
 void deRegisterInterest();
-
+int file_writes( int fd, void* x, size_t n );
 int _reads( int fd, void* x, size_t n );
 
 int _read(int file, char *ptr, int len);

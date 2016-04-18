@@ -61,6 +61,19 @@ void deRegisterInterest(){
                );
 }
 
+
+int file_writes( int fd, void* x, size_t n ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "mov r1, %2 \n"
+              "mov r2, %3 \n"
+              "svc #8     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (fd), "r" (x), "r" (n) 
+            : "r0", "r1", "r2" );
+  return r;
+}
 enum {
  UART_FR_RXFE = 0x10,
  UART_FR_TXFF = 0x20,

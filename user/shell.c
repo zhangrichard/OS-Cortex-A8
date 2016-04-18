@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include  <string.h>
+#include "../device/PL011.h"
 // combine task 3
 
 // static buffer_share bs;
@@ -80,7 +81,7 @@ void shell() {
   // write(0,string,10);
   int count =   tokenize(cache,length,args);
   char str [10];
-  sscanf("input is%s",str);
+  // sscanf("input is%s",str);
   printf("%s\n",str );
   if (strcmp(args[0],"fork") == 0){ 
     printf("%s\n","forking" );
@@ -88,8 +89,14 @@ void shell() {
     fork(pid);
     // fork();
   }
-
-  if (strcmp(string,"exit") == 0){
+  if(strcmp (args[0],"folder")==0){//folder 1002 hello 
+    printf("%s\n","write to folder" );
+    int address = atoi(args[1]);
+    // char *a = itox()
+    printf("%s\n",args[2]);
+    int result = file_writes( address, args[2], sizeof(args[2]) );
+  }
+  if (strcmp(args[0],"exit") == 0){
     printf("%s\n","exiting ");
     // exit();
     int pid = atoi(args[1]);

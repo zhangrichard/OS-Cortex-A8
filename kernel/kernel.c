@@ -3,6 +3,7 @@
 #include <stdlib.h>
 // #include "queue.h"
 #include "string.h"
+#include "../device/disk.h"
 
 /* Since we *know* there will be 2 processes, stemming from the 2 user 
  * programs, we can 
@@ -287,6 +288,16 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       
       InterestFlag[current->pid] = false;      
       // ctx->gpr[0]= pidNum;
+      break;
+    }
+    case 0x08:{ //int file_reads( int fd, void* x, size_t n )
+      int   fd = ( int   )( ctx->gpr[ 0 ] );  
+      char*  x = ( char* )( ctx->gpr[ 1 ] );  
+      int    n = ( int   )( ctx->gpr[ 2 ] ); 
+      disk_wr(fd,x,n);
+
+      // InterestFlag[current->pid] = false;      
+      ctx->gpr[0]= fd;
       break;
     }
   
