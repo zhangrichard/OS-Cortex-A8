@@ -16,6 +16,7 @@ int is_prime( uint32_t x ) {
   return 1;
 }
 
+
 // combine task 3
 // void P0() {
 //   char* x = "hello world, I'm P0\n";
@@ -27,8 +28,12 @@ int is_prime( uint32_t x ) {
 // future computation
 
 void P0() {
-  // char   buf[BUF_SIZE];
+  // char   buf[BUF_SIZE]
+ 
   int x = 0;
+  
+
+  
   // fork();
       // int n =0;
     // while(1){
@@ -69,28 +74,47 @@ void P0() {
 
   
   while(1){
-     flag[0] = true;
-     turn = 1;
-     while (flag[1] && turn == 1)
-     {
-         // busy wait
-     }
-     // critical section
-     int result = withdrawl(90);
-     printf("withdrawl 90 is %d\n", result);
+     // flag[0] = true;
+     // turn = 0;
+     // while (flag[1]==true && turn == 0)
+     // {
+     //     // busy wait
+     // }
+     // // critical section
+     // int result = withdrawl(20);
+     // printf("withdrawl 20 is %d\n", result);
      
-     // end of critical section
-     flag[0] = false; 
+     // // end of critical section
+     // flag[0] = false; 
 
-    for( uint32_t x = ( 1 << 8 ); x < ( 1 << 24 ); x++ ) {
-      int r = is_prime( x ); //
-      printf( "is_prime( %d ) = %d\n", x, r );
-      // sprintf(buf, "is_prime( %d ) = %d\n", x, r );
-      // write(1, buf, strlen(buf));
+
+      while(registerInterest())
+      {
+        // busy wait
+      }
+      // enter critical section
+      int acountMoney = load();
+         printf("p0 read data %d\n", acountMoney);
+         //conflict
+         if (withdrawl(20,&acountMoney))
+          {
+            printf("take 20 from account \n");
+          }
+
+         
+         store(acountMoney);
+         printf("p0 after taking %d\n", acountMoney);
+
+      deRegisterInterest();
+    // for( uint32_t x = ( 1 << 8 ); x < ( 1 << 24 ); x++ ) {
+    //   int r = is_prime( x ); //
+    //   printf( "is_prime( %d ) = %d\n", x, r );
+    //   // sprintf(buf, "is_prime( %d ) = %d\n", x, r );
+    //   // write(1, buf, strlen(buf));
       for( int i = 0; i < 0x05000000; i++ ) {
         asm volatile( "nop" );
       } 
-    }
+    // }
   
   }
 

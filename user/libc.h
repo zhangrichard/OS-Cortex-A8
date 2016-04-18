@@ -4,11 +4,29 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/stat.h>
+#include <stdbool.h>
+
+// void init_buffer_share(buffer_share *bs);
+int withdrawl(int amount,int *acountMoney);
+// bool flag[2];
+// int turn;
+// typedef struct {
+// 	int accountNumber;
+// 	int money;
+// 	// https://en.wikipedia.org/wiki/Peterson%27s_algorithm
+// }buffer_share;
 // cooperatively yield control of processor, i.e., invoke the scheduler
 void yield();
 
 // write n bytes from x to the file descriptor fd
-int _read( int fd, void* x, size_t n );
+int load();
+int store(int data);
+bool registerInterest();
+void deRegisterInterest();
+
+int _reads( int fd, void* x, size_t n );
+
+int _read(int file, char *ptr, int len);
 int _write( int fd, void* x, size_t n );
 int fork();
 int exit1();

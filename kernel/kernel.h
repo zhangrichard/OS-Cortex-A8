@@ -38,19 +38,14 @@ typedef struct {
   int priority;
 } pcb_t;
 
-typedef struct {
-	int accountNumber;
-	int money;
-	// https://en.wikipedia.org/wiki/Peterson%27s_algorithm
 
-}buffer_share;
 
-extern bool flag[2];
-extern int turn;
+
+
 // typedef struct {
 // 	pcb_t pc
 // }
-extern int withdrawl(int amount);
+// extern int withdrawl(int amount);
 
 #define PCB_SIZE 100
 

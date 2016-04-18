@@ -3,6 +3,13 @@
 #include <stdio.h>
 #include  <string.h>
 // combine task 3
+
+// static buffer_share bs;
+
+// int turn;
+
+
+
 // void P0() {
 //   char* x = "hello world, I'm P0\n";
 
@@ -51,24 +58,30 @@ int tokenize(buffer_t buffer, int length, args_t args) {
 }
 void shell() {
   // char   buf[BUF_SIZE];
-  int x = 0;
   args_t args;
   buffer_t cache;
   char * start = "enter";
   char * output = "output is : \n";
   char * p0 = "p0 thread\n";
 
+//initialise
+  // init_buffer_share(&bs);
+  // int x = 0;
+  
+  // turn = 0;
 
   
   while(1){
   printf("%s\n","starting command shell" );
      int length;  
   printf("%s\n",start );
-  length= _read(1,cache,100);
+  length= _reads(1,cache,100);
   char * string = &cache[0];
   // write(0,string,10);
   int count =   tokenize(cache,length,args);
-  
+  char str [10];
+  sscanf("input is%s",str);
+  printf("%s\n",str );
   if (strcmp(args[0],"fork") == 0){ 
     printf("%s\n","forking" );
     int pid = atoi(args[1]);

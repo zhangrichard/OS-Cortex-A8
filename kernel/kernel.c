@@ -20,23 +20,21 @@ static int numberOfProcess =4;
 heap_t *h = NULL;
 // heap_t *m;
 pid_t nextpid =4;
-flag = {false,false};
-turn = 0;
+bool InterestFlag[2] =  {false,false};
+int shareInt =100;
+int turn;
 
-buffer_share *bs;
+// turn = 0;
 
-void init_buffer_share(buffer_share *bs){
-  bs = malloc(sizeof(buffer_share));
-  bs->accountNumber=1;
-  bs->money=100;
-}
+// buffer_share *bs;
 
-int withdrawl(int amount){
-  if(amount<= bs->money){
-    bs->money -=amount;
-    return 1;
-  }else return 0;
-}
+
+// int withdrawl(int amount){
+//   if(amount<= bs->money){
+//     bs->money -=amount;
+//     return 1;
+//   }else return 0;
+// }
 // base on the priority to schedule process
 void priorityBaseScheduler( ctx_t* ctx ) {
   // find largest priority   store index and coresond priority
@@ -137,17 +135,17 @@ void kernel_handler_rst( ctx_t* ctx              ) {
   // free(m);
    // initiallize queue
   // h->len=0;
-  init_buffer_share(bs);
+  
 
   h= calloc(1, sizeof (heap_t));
   queue_init(h);
   for (int index = 0;index<numberOfProcess;index++){
     push(h,pcb[index].priority,index);
   }
-  int pid = pop(h);
+  // int pid = pop(h);
    
   //start from shell
-  current = &pcb[pid]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
+  current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 
   irq_enable();
 
@@ -249,6 +247,49 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       ctx->gpr[0]= pidNum;
       break;
     }
+
+    case 0x04:{ //load()
+   
+      // 
+
+      // exitQueueByPid(h,pidNum);
+
+      ctx->gpr[0]= shareInt;
+      break;
+    }
+    case 0x05:{ //store(data)
+   
+      int   data = ( int   )( ctx->gpr[ 0 ] );    
+      
+      shareInt = data;
+   
+      // ctx->gpr[0]= pidNum;
+      break;
+    }
+    case 0x06:{ //registerinterest()
+        // bool result ;
+        // result = (InterestFlag == false) ? false : true ;
+        
+        int process =current->pid; 
+        if (turn != process) {  
+          ctx->gpr[0] = false;
+          break;
+        } 
+
+        // printf("%d\n", process);   
+        InterestFlag[process] = true;
+        turn =(process+1)%2;
+        // printf("bool %d\n",InterestFlag[(process+1)%2] == true);
+      ctx->gpr[0]= InterestFlag[(process+1)%2]&& turn == (process+1)%2;
+      break;
+    }
+    case 0x07:{ //deRegisterinterest
+      
+      InterestFlag[current->pid] = false;      
+      // ctx->gpr[0]= pidNum;
+      break;
+    }
+  
     default   : { // unknown
       break;
     }
