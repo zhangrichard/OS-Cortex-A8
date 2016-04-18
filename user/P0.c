@@ -69,7 +69,18 @@ void P0() {
 
   
   while(1){
-
+     flag[0] = true;
+     turn = 1;
+     while (flag[1] && turn == 1)
+     {
+         // busy wait
+     }
+     // critical section
+     int result = withdrawl(90);
+     printf("withdrawl 90 is %d\n", result);
+     
+     // end of critical section
+     flag[0] = false; 
 
     for( uint32_t x = ( 1 << 8 ); x < ( 1 << 24 ); x++ ) {
       int r = is_prime( x ); //

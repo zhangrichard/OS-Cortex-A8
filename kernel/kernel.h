@@ -26,19 +26,31 @@
 extern uint32_t tos_user;
 
 typedef struct {
-  uint32_t cpsr, pc, gpr[ 13 ], sp, lr, priority;
+  uint32_t cpsr, pc, gpr[ 13 ], sp, lr;
 } ctx_t;
 
 typedef int pid_t;
 
 typedef struct {
   pid_t pid;
+  pid_t ppid;
   ctx_t ctx;
+  int priority;
 } pcb_t;
 
+typedef struct {
+	int accountNumber;
+	int money;
+	// https://en.wikipedia.org/wiki/Peterson%27s_algorithm
+
+}buffer_share;
+
+extern bool flag[2];
+extern int turn;
 // typedef struct {
 // 	pcb_t pc
 // }
+extern int withdrawl(int amount);
 
 #define PCB_SIZE 100
 

@@ -6,18 +6,20 @@
  #include "constant.h"
 typedef struct {
     int priority;
-    int index;
+    int pid;
 } node_t;
  
 typedef struct {
     node_t *nodes;
     int len;
     int size;
+    int indexPop;
 } heap_t;
 
 
-
-void push (heap_t *h, int priority, int index) ;
+// push and search by pid
+void push (heap_t *h, int priority, int pid) ;
 int pop (heap_t *h) ;
-void exitQueue(heap_t *h,int index);
+void exitQueueByPid(heap_t *h,int pid);
+void queue_init( heap_t *h);
 #endif
