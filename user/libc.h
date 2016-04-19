@@ -6,6 +6,11 @@
 #include <sys/stat.h>
 #include <stdbool.h>
 
+
+
+
+int file_create( int fd, void* x, size_t n ) ;
+
 // void init_buffer_share(buffer_share *bs);
 int withdrawl(int amount,int *acountMoney);
 // bool flag[2];

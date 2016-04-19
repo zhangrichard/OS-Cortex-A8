@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include  <string.h>
+
 #include "../device/PL011.h"
 // combine task 3
 
@@ -89,18 +90,22 @@ void shell() {
     fork(pid);
     // fork();
   }
-  if(strcmp (args[0],"folder")==0){//folder 1002 hello 
+  if(strcmp (args[0],"folder")==0){// 01 01230000 F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF
     printf("%s\n","write to folder" );
     int address = atoi(args[1]);
     // char *a = itox()
+    // if(strlen(args[2]))
     printf("%s\n",args[2]);
-    int result = file_writes( address, args[2], sizeof(args[2]) );
+    int result = file_writes( address, args[2],  strlen(args[2]) );
   }
   if (strcmp(args[0],"exit") == 0){
     printf("%s\n","exiting ");
     // exit();
     int pid = atoi(args[1]);
     exit1(pid);
+  }
+  if (strcmp(args[0],"create")== 0){
+    file_create(atoi(args[1]),args[2],16);
   }
   // write(0,output,13);
   // write(0,cache,length);

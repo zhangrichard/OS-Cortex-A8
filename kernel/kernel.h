@@ -37,7 +37,13 @@ typedef struct {
   int priority;
 } pcb_t;
 
+typedef struct{
+ int description;
+ int fcb_address;
+ int flags;
+ int rwPointer;
 
+}fdt_t;
 
 
 

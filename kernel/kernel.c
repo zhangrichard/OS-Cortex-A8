@@ -4,6 +4,8 @@
 // #include "queue.h"
 #include "string.h"
 #include "../device/disk.h"
+#include <sys/unistd.h>
+// #include "../device/disk.c"
 
 /* Since we *know* there will be 2 processes, stemming from the 2 user 
  * programs, we can 
@@ -290,16 +292,65 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       // ctx->gpr[0]= pidNum;
       break;
     }
-    case 0x08:{ //int file_reads( int fd, void* x, size_t n )
+
+
+    case 0x08:{ //int file_reads( int fd, void* x, size_t n ) 8196
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
       int    n = ( int   )( ctx->gpr[ 2 ] ); 
+       if (strlen(x)<16){
+        for (int i = strlen(x);i<16;i++)
+        x[i] = 0 ;
+      } 
+      n= 16;
+      printf("data %s\n", x);
+      printf("address %d\n",fd );
+      printf("size %d\n", n);
+     
+      disk_get_block_num();
+      PL011_puth( UART0, 0x01 );        // write command
+      PL011_putc( UART0, ' '  );        // write separator
+       addr_puth( UART0, fd    );        // write address
+      PL011_putc( UART0, ' '  );        // write separator
+       data_puth( UART0, x, n );        // write data
+      PL011_putc( UART0, '\n' );
       disk_wr(fd,x,n);
 
       // InterestFlag[current->pid] = false;      
       ctx->gpr[0]= fd;
       break;
     }
+
+    case 0x09:{
+      int   fd = ( int   )( ctx->gpr[ 0 ] );  
+      char*  x = ( char* )( ctx->gpr[ 1 ] );  
+      int    n = ( int   )( ctx->gpr[ 2 ] ); 
+
+      disk_get_block_num();
+      PL011_puth( UART0, 0x01 );        // write command
+      PL011_putc( UART0, ' '  );        // write separator
+       addr_puth( UART0, fd    );        // write address
+      PL011_putc( UART0, ' '  );        // write separator
+       data_puth( UART0, x, n );        // write data
+      PL011_putc( UART0, '\n' );
+      disk_wr(fd,x,16);
+    
+      printf("into syscall %s\n", x);
+      ctx->gpr[0]= 0;
+      break;
+    }
+
+      case 0x10:{
+      int   fd = ( int   )( ctx->gpr[ 0 ] );  
+      char*  x = ( char* )( ctx->gpr[ 1 ] );  
+      int    n = ( int   )( ctx->gpr[ 2 ] );
+      printf("into syscall %s\n", x);
+      ctx->gpr[0]= 0;
+      break;
+    }
+      
+    
+
   
     default   : { // unknown
       break;

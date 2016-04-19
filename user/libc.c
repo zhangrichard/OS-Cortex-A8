@@ -11,6 +11,8 @@
 //   flag[1] =false;
 //   flag[0] =false;
 // }
+
+
 int withdrawl(int amount,int *acountMoney){
   if(amount<= *acountMoney){
     
@@ -74,6 +76,71 @@ int file_writes( int fd, void* x, size_t n ) {
             : "r0", "r1", "r2" );
   return r;
 }
+
+int file_create( int fd, void* x, size_t n ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "mov r1, %2 \n"
+              "mov r2, %3 \n"
+              "svc #9     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (fd), "r" (x), "r" (n) 
+            : "r0", "r1", "r2" );
+  return r;
+}
+
+int file_close( int fd, void* x, size_t n ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "mov r1, %2 \n"
+              "mov r2, %3 \n"
+              "svc #10     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (fd), "r" (x), "r" (n) 
+            : "r0", "r1", "r2" );
+  return r;
+}
+
+int file_open( int fd, void* x, size_t n ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "mov r1, %2 \n"
+              "mov r2, %3 \n"
+              "svc #11     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (fd), "r" (x), "r" (n) 
+            : "r0", "r1", "r2" );
+  return r;
+}
+
+int file_unlink( int fd, void* x, size_t n ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "mov r1, %2 \n"
+              "mov r2, %3 \n"
+              "svc #12     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (fd), "r" (x), "r" (n) 
+            : "r0", "r1", "r2" );
+  return r;
+}
+int file_read( int fd, void* x, size_t n ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "mov r1, %2 \n"
+              "mov r2, %3 \n"
+              "svc #13     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (fd), "r" (x), "r" (n) 
+            : "r0", "r1", "r2" );
+  return r;
+}
+
 enum {
  UART_FR_RXFE = 0x10,
  UART_FR_TXFF = 0x20,
