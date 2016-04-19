@@ -18,8 +18,9 @@ void data_geth( PL011_t* d,       uint8_t* x, int n ) {
     x[ i ] = PL011_geth( d );
   }
 }
+// 01 01000000 66696C652E7478740D00000000000000
 
-uint32_t disk_get_block_num() {
+uint32_t disk_get_block_num()
   int n = 2 * sizeof( uint32_t ); uint8_t x[ n ];
 
   for( int i = 0; i < RETRY; i++ ) {

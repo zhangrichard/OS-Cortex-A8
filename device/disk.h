@@ -9,7 +9,9 @@
 #include "SP804.h"
 
 #define RETRY ( 3 )
-
+void addr_puth( PL011_t* d, uint32_t x );
+void data_geth( PL011_t* d,       uint8_t* x, int n ) ;
+void data_puth( PL011_t* d, const uint8_t* x, int n );
 // query the disk block count
 extern uint32_t disk_get_block_num();
 // query the disk block length
