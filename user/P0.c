@@ -95,7 +95,7 @@ void P0() {
       // enter critical section
       int acountMoney = load();
          printf("p0 read data %d\n", acountMoney);
-         //conflict
+         
          if (withdrawl(20,&acountMoney))
           {
             printf("take 20 from account \n");

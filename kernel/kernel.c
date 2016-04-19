@@ -19,6 +19,7 @@
 #define DEBUG 1
 
 pcb_t pcb[ PCB_SIZE ], *current = NULL;
+fdt_t fdb[100];
 static int numberOfProcess =4;
 heap_t *h = NULL;
 // heap_t *m;
@@ -26,7 +27,7 @@ pid_t nextpid =4;
 bool InterestFlag[2] =  {false,false};
 int shareInt =100;
 int turn;
-
+int signalflag = 0;
 // turn = 0;
 
 // buffer_share *bs;
@@ -76,17 +77,8 @@ void scheduler( ctx_t* ctx ) {
   //   current = &pcb[ 0 ];
   // }
 }
-
-void kernel_handler_rst( ctx_t* ctx              ) { 
-  /* Initialise PCBs representing processes stemming from execution of
-   * the two user programs.  Note in each case that
-   *    
-   * - the CPSR value of 0x50 means the processor is switched into USR 
-   *   mode, with IRQ interrupts enabled, and
-   * - the PC and SP values matche the entry point and top of stack. 
-   */
-   printf("%s\n","initialising" );
-  UART0->IMSC           |= 0x00000010; // enable UART    (Rx) interrupt
+void initialising_kernel( ctx_t* ctx){
+    UART0->IMSC           |= 0x00000010; // enable UART    (Rx) interrupt
   UART0->CR              = 0x00000301; // enable UART (Tx+Rx)
   TIMER0->Timer1Load     = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl     = 0x00000002; // select 32-bit   timer
@@ -131,26 +123,36 @@ void kernel_handler_rst( ctx_t* ctx              ) {
    * restored (i.e., executed) when the function then returns.
    */
   // PL011_puts( UART0 , "Scheduler: switching to process 0\n", 34);
-
-  // h  = (heap_t*) calloc(1, sizeof (heap_t));
-  // m = (heap_t *) malloc(sizeof(heap_t));
-  // m->len =0;
-  // free(m);
-   // initiallize queue
-  // h->len=0;
-  
-
   h= calloc(1, sizeof (heap_t));
   queue_init(h);
   for (int index = 0;index<numberOfProcess;index++){
     push(h,pcb[index].priority,index);
   }
+
+  fdb[0].description = 0;
+  fdb[0].fcb_address = "stdin";
+  fdb[0].flags = O_R;
+  fdb[0].rwPointer =0;
+
+
   // int pid = pop(h);
-   
   //start from shell
   current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 
+  // disk_wr(0,"size",16);
+
   irq_enable();
+}
+void kernel_handler_rst( ctx_t* ctx              ) { 
+  /* Initialise PCBs representing processes stemming from execution of
+   * the two user programs.  Note in each case that
+   *    
+   * - the CPSR value of 0x50 means the processor is switched into USR 
+   *   mode, with IRQ interrupts enabled, and
+   * - the PC and SP values matche the entry point and top of stack. 
+   */
+   printf("%s\n","initialising" );
+   initialising_kernel( ctx);
 
   return;
 }
@@ -252,8 +254,6 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     }
 
     case 0x04:{ //load()
-   
-      // 
 
       // exitQueueByPid(h,pidNum);
 
@@ -307,7 +307,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       printf("address %d\n",fd );
       printf("size %d\n", n);
      
-      disk_get_block_num();
+      // disk_get_block_num();
       PL011_puth( UART0, 0x01 );        // write command
       PL011_putc( UART0, ' '  );        // write separator
        addr_puth( UART0, fd    );        // write address
@@ -321,12 +321,13 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       break;
     }
 
-    case 0x09:{
+    case 0x09:{ //create file
+
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
       int    n = ( int   )( ctx->gpr[ 2 ] ); 
 
-      disk_get_block_num();
+      // disk_get_block_num();
       PL011_puth( UART0, 0x01 );        // write command
       PL011_putc( UART0, ' '  );        // write separator
        addr_puth( UART0, fd    );        // write address
@@ -340,7 +341,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       break;
     }
 
-      case 0x10:{
+      case 0x10:{ // read file
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
       int    n = ( int   )( ctx->gpr[ 2 ] );
