@@ -19,7 +19,7 @@
 #define DEBUG 1
 
 pcb_t pcb[ PCB_SIZE ], *current = NULL;
-fdt_t fdb[100];
+fdt_t fdt;
 static int numberOfProcess =4;
 heap_t *h = NULL;
 // heap_t *m;
@@ -28,18 +28,8 @@ bool InterestFlag[2] =  {false,false};
 int shareInt =100;
 int turn;
 int signalflag = 0;
-// turn = 0;
-
-// buffer_share *bs;
 
 
-// int withdrawl(int amount){
-//   if(amount<= bs->money){
-//     bs->money -=amount;
-//     return 1;
-//   }else return 0;
-// }
-// base on the priority to schedule process
 void priorityBaseScheduler( ctx_t* ctx ) {
   // find largest priority   store index and coresond priority
   
@@ -66,19 +56,11 @@ void scheduler( ctx_t* ctx ) {
     memcpy( ctx, &(current+1)->ctx, sizeof( ctx_t ) );
     current =  (current+1);
   }
-  // else if ( current == &pcb[ 1 ] ) {
-  //   memcpy( &pcb[ 1 ].ctx, ctx, sizeof( ctx_t ) );
-  // n  memcpy( ctx, &pcb[ 2].ctx, sizeof( ctx_t ) );
-  //   current = &pcb[ 2 ];
-  // }
-  // else if ( current == &pcb[ 2 ] ) {
-  //   memcpy( &pcb[ 2 ].ctx, ctx, sizeof( ctx_t ) );
-  //   memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
-  //   current = &pcb[ 0 ];
-  // }
+
 }
+
 void initialising_kernel( ctx_t* ctx){
-    UART0->IMSC           |= 0x00000010; // enable UART    (Rx) interrupt
+  UART0->IMSC           |= 0x00000010; // enable UART    (Rx) interrupt
   UART0->CR              = 0x00000301; // enable UART (Tx+Rx)
   TIMER0->Timer1Load     = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl     = 0x00000002; // select 32-bit   timer
@@ -124,22 +106,17 @@ void initialising_kernel( ctx_t* ctx){
    */
   // PL011_puts( UART0 , "Scheduler: switching to process 0\n", 34);
   h= calloc(1, sizeof (heap_t));
+
+  // initialize ready queue
   queue_init(h);
   for (int index = 0;index<numberOfProcess;index++){
     push(h,pcb[index].priority,index);
   }
 
-  fdb[0].description = 0;
-  fdb[0].fcb_address = "stdin";
-  fdb[0].flags = O_R;
-  fdb[0].rwPointer =0;
+// initalize file system
+  initialTable(&fdt);
 
-
-  // int pid = pop(h);
-  //start from shell
   current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
-
-  // disk_wr(0,"size",16);
 
   irq_enable();
 }
@@ -228,12 +205,9 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
         }
       }
-
       memcpy( &pcb[ currentProcess ].ctx, &pcb[pidNum].ctx, sizeof( ctx_t ) );
 
       pcb[ currentProcess ].ctx.sp   = ( uint32_t )(  &(tos_user)+1000*currentProcess  );
-      
-
       // push queue
       push(h,pcb[currentProcess].priority,currentProcess);
       
@@ -246,7 +220,6 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
    
       int   pidNum = ( int   )( ctx->gpr[ 0 ] );    
   
-
       exitQueueByPid(h,pidNum);
    
       ctx->gpr[0]= pidNum;
@@ -255,18 +228,14 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
     case 0x04:{ //load()
 
-      // exitQueueByPid(h,pidNum);
-
       ctx->gpr[0]= shareInt;
       break;
     }
     case 0x05:{ //store(data)
    
-      int   data = ( int   )( ctx->gpr[ 0 ] );    
-      
+      int   data = ( int   )( ctx->gpr[ 0 ] );   
       shareInt = data;
-   
-      // ctx->gpr[0]= pidNum;
+  
       break;
     }
     case 0x06:{ //registerinterest()
@@ -278,12 +247,11 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
           ctx->gpr[0] = false;
           break;
         } 
-
         // printf("%d\n", process);   
         InterestFlag[process] = true;
         turn =(process+1)%2;
         // printf("bool %d\n",InterestFlag[(process+1)%2] == true);
-      ctx->gpr[0]= InterestFlag[(process+1)%2]&& turn == (process+1)%2;
+        ctx->gpr[0]= InterestFlag[(process+1)%2]&& turn == (process+1)%2;
       break;
     }
     case 0x07:{ //deRegisterinterest
@@ -293,16 +261,16 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       break;
     }
 
+    case 0x08:{ //int file_create( int fd, void* x, size_t n ) 8196
 
-    case 0x08:{ //int file_reads( int fd, void* x, size_t n ) 8196
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
-      int    n = ( int   )( ctx->gpr[ 2 ] ); 
+      int    mode = ( int   )( ctx->gpr[ 2 ] ); 
        if (strlen(x)<16){
         for (int i = strlen(x);i<16;i++)
         x[i] = 0 ;
       } 
-      n= 16;
+      int n= 16;
       printf("data %s\n", x);
       printf("address %d\n",fd );
       printf("size %d\n", n);
@@ -315,33 +283,27 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
        data_puth( UART0, x, n );        // write data
       PL011_putc( UART0, '\n' );
       disk_wr(fd,x,n);
-
+      
+      addFile(&fdt,x,mode);
       // InterestFlag[current->pid] = false;      
-      ctx->gpr[0]= fd;
-      break;
-    }
-
-    case 0x09:{ //create file
-
-      int   fd = ( int   )( ctx->gpr[ 0 ] );  
-      char*  x = ( char* )( ctx->gpr[ 1 ] );  
-      int    n = ( int   )( ctx->gpr[ 2 ] ); 
-
-      // disk_get_block_num();
-      PL011_puth( UART0, 0x01 );        // write command
-      PL011_putc( UART0, ' '  );        // write separator
-       addr_puth( UART0, fd    );        // write address
-      PL011_putc( UART0, ' '  );        // write separator
-       data_puth( UART0, x, n );        // write data
-      PL011_putc( UART0, '\n' );
-      disk_wr(fd,x,16);
-    
-      printf("into syscall %s\n", x);
       ctx->gpr[0]= 0;
       break;
     }
+   
+    case 0x9:{//open file
 
-      case 0x10:{ // read file
+      char *x = ( char *  )( ctx->gpr[ 0 ] );
+      int   rwBit = ( int   )( ctx->gpr[1 ] );
+      int fd=0; //default
+      for (int i = 0;i<fdt.size;i++){
+        if(strcmp(x,fdt.file[i].filename)){
+          fd = fdt.file[i].fd;
+          fdt.file[i].flags = rwBit;
+        }
+      }
+      ctx->gpr[0]= fd;
+    }
+    case 0x10:{ // read file
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
       int    n = ( int   )( ctx->gpr[ 2 ] );
@@ -349,10 +311,33 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       ctx->gpr[0]= 0;
       break;
     }
-      
-    
 
-  
+     case 0x11:{ //file_open file
+      int   fd = ( int   )( ctx->gpr[ 0 ] );  
+      char*  x = ( char* )( ctx->gpr[ 1 ] );  
+      int    mode = ( int   )( ctx->gpr[ 2 ] ); 
+      // disk_get_block_num();
+      PL011_puth( UART0, 0x01 );        // write command
+      PL011_putc( UART0, ' '  );        // write separator
+       addr_puth( UART0, fd    );        // write address
+      PL011_putc( UART0, ' '  );        // write separator
+       data_puth( UART0, x, 16 );        // write data
+      PL011_putc( UART0, '\n' );
+      disk_wr(fd,x,16);
+     // increase siz
+      printf("return fd %d\n", fd);
+      ctx->gpr[0]= fd;
+      break;
+    }
+
+    case 0x13:{ // close(fd)
+      char*  filename = ( char* )( ctx->gpr[ 0 ] ); 
+      int index = lookUpIndex(&fdt,filename);
+      freeBlock(&fdt.file[index]);
+      printf("into syscall %s\n", filename);
+      ctx->gpr[0]= 0;
+      break;
+    }
     default   : { // unknown
       break;
     }
@@ -360,21 +345,18 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
   return;
 }
+
 void kernel_handler_irq(ctx_t *ctx) {
   // Step 2: read  the interrupt identifier so we know the source.
 
   uint32_t id = GICC0->IAR;
 
   // Step 4: handle the interrupt, then clear (or reset) the source.
-
-
   if( id == GIC_SOURCE_TIMER0 ) {
-  priorityBaseScheduler(ctx);  
-
-  TIMER0->Timer1IntClr = 0x01;
+    priorityBaseScheduler(ctx);  
+    TIMER0->Timer1IntClr = 0x01;
   }
-
   // Step 5: write the interrupt identifier to signal we're done.
-
   GICC0->EOIR = id;
+
 }

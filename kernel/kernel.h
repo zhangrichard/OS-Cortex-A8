@@ -21,9 +21,8 @@
 //https://www3.cs.stonybrook.edu/~skiena/392/programs/queue.h
  #include "queue.h"
  // #include "constant.h"
+#include "filetable.h"
 
-#define O_R 0
-#define O_w 1
 extern uint32_t tos_user;
 
 typedef struct {
@@ -39,13 +38,7 @@ typedef struct {
   int priority;
 } pcb_t;
 
-typedef struct{
- int description;
- char * fcb_address;
- int flags;
- int rwPointer;
 
-}fdt_t;
 
 
 

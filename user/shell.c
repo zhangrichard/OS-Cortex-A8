@@ -107,6 +107,9 @@ void shell() {
   if (strcmp(args[0],"create")== 0){
     file_create(atoi(args[1]),args[2],16);
   }
+  if (strcmp(args[0],"close")== 0){
+    file_close(args[1]);
+  }
   // if (strcmp(args[1]),"read")== 0){
   //   char * read;
   //   file_read(fd,read,4);
