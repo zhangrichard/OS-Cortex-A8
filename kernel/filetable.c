@@ -26,7 +26,8 @@ void initialTable(fdt_t *fdt){
 
 int openFile (directory_t *d, fdt_t *fdt,char*filename,int mode){
 	int fd = lookUpIndex(d,filename);
-	if(fd = -1){
+	// printf("open file at fd%d\n",fd );
+	if(fd == -1){
 		return -1;
 	}
 	else{

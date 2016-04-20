@@ -17,10 +17,24 @@ typedef struct{
 //flat directory
 typedef struct 
 {
+	// char * directoryName;
 	file_t file[10];
+	// char * directoryName[10];
 	int size;
 	// char * directory;
 }directory_t;
+
+
+typedef struct 
+{
+	char * directoryName;
+	char ** filenames;
+	struct directory_d * next_directory;
+	int size;
+	int fileNum;
+}directory_d;
+
+
 void initialDirectory(directory_t *d);
 void createFile(directory_t *d,char *filename);
 int openFile (directory_t *d, fdt_t *fdt,char *filename,int mode);

@@ -25,9 +25,9 @@ void push (heap_t *h, int priority, int pid) {
             }
             h->nodes[i].priority = priority;
             h->nodes[i].pid = pid;
-            printf("position push%d\n",i );
-            printf("position 0%d\n",h->nodes[0].priority);
-            printf("position cur priority%d\n",priority);
+            // printf("position push%d\n",i );
+            // printf("position 0%d\n",h->nodes[0].priority);
+            // printf("position cur priority%d\n",priority);
 
             h->len++;
             return;

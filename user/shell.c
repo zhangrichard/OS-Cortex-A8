@@ -46,6 +46,14 @@ int tokenize(buffer_t buffer, int length, args_t args) {
         buffer[i] = '\0';
         args[count] = NULL; /* no more arguments to this command */
         break;
+      case '\r':
+        if (start  != -1) {
+            args[count] = &buffer[start]; /* set up pointer */
+            count++;
+          }
+        buffer[i] = '\0'; /* add null character to make a C string */
+        start = -1;
+        break;
       default: /* some other character */
         if (start == -1) {
           start = i;
@@ -63,6 +71,7 @@ void shell() {
   // char   buf[BUF_SIZE];
   args_t args;
   buffer_t cache;
+  buffer_t dir;
   char * start = "enter";
   char * output = "output is : \n";
   char * p0 = "p0 thread\n";
@@ -75,11 +84,10 @@ void shell() {
 
   
   while(1){
-  printf("%s\n","starting command shell" );
-     int length;  
-  printf("%s\n",start );
+  printf("%s\n","/Downloads/question$" );
+  int length;  
   length= _reads(1,cache,100);
-  char * string = &cache[0];
+
   // write(0,string,10);
   int count =   tokenize(cache,length,args);
   char str [10];
@@ -118,12 +126,16 @@ void shell() {
     printf("read value is %s\n",temp );
   }
    if (strcmp(args[0],"write")== 0){
-    file_writes(fd,args[1],16);
+    file_writes(10,args[1],16);
   }
    if (strcmp(args[0],"close")== 0){
     file_close(fd);
   }
-
+  if(strcmp (args[0],"pwd")==0){// 01 01230000 F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF
+    // printf("shell\n" );
+    pwd(dir);
+    printf("%s\n",dir);
+  }
   // if (strcmp(args[1]),"read")== 0){
   //   char * read;
   //   file_read(fd,read,4);

@@ -72,3 +72,13 @@ void file_close(int fd ) {
             : "r0" );
   // return r;
 }
+void pwd( void* x ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "svc #14     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (x)
+            : "r0" );
+  // return r;
+}

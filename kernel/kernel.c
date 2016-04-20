@@ -16,19 +16,23 @@
  *   can be created, and neither is able to complete.
  */
 
-#define DEBUG 1
-
+#define DEBUG 0
+char * working_directory = "/Downloads/question";
 pcb_t pcb[ PCB_SIZE ], *current = NULL;
 fdt_t fdt;
 directory_t d;
+
+directory_d *curdir;
 static int numberOfProcess =4;
 heap_t *h = NULL;
 // heap_t *m;
-pid_t nextpid =4;
+pid_t nextpid =3;
 bool InterestFlag[2] =  {false,false};
 int shareInt =100;
 int turn;
 int signalflag = 0;
+
+
 
 
 void priorityBaseScheduler( ctx_t* ctx ) {
@@ -117,7 +121,7 @@ void initialising_kernel( ctx_t* ctx){
 // initalize file system
   initialTable(&fdt);
   initialDirectory(&d);
-
+  curdir = (directory_d *)malloc(sizeof(directory_d));
   current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 
   irq_enable();
@@ -220,6 +224,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     }
     case 0x03:{ //exit(pidNum)
    
+
       int   pidNum = ( int   )( ctx->gpr[ 0 ] );    
   
       exitQueueByPid(h,pidNum);
@@ -272,7 +277,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       break;
     }
    
-    case 0x9:{//fd = open (file,mode)
+    case 0x09:{//fd = open (file,mode)
 
       char *x = ( char *  )( ctx->gpr[ 0 ] );
       int   mode = ( int   )( ctx->gpr[1 ] );
@@ -281,7 +286,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       printf("open at fd%d\n",fd );
       ctx->gpr[0]= fd;
     }
-    case 0x10:{ // read file
+    case 0xA:{ // read file
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
       int    n = ( int   )( ctx->gpr[ 2 ] );
@@ -306,7 +311,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       break;
     }
 
-     case 0x12:{ //write(fd,z,4) 
+     case 0xC:{ //write(fd,z,4) 
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  z = ( char* )( ctx->gpr[ 1 ] );  
       int    len = ( int   )( ctx->gpr[ 2 ] ); 
@@ -335,12 +340,38 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       break;
     }
 
-    case 0x13:{ // close(fd)
+    case 0xD:{ // close(fd)
       int fd = ( int )( ctx->gpr[ 0 ] ); 
       
       closeFile (&fdt,fd);
       ctx->gpr[0]= 0;
       break;
+    }
+    case 0xE:{ // pwd(fd)
+      char  *x = ( char* )( ctx->gpr[ 0 ] ); 
+      strcpy(x,working_directory);
+      break;
+    }
+    case 0xF:{ // mkdir(name)
+      char  *x = ( char* )( ctx->gpr[ 0 ] ); 
+      directory_d * new = (directory_d *)malloc(sizeof(directory_d));
+      new->directoryName = x;
+      curdir->next_directory = (struct directory_d *)new;
+      break;
+    }
+    case 0x10:{ //touch(filename)
+      char  *x = ( char* )( ctx->gpr[ 0 ] );
+      curdir->filenames[0] = malloc(sizeof(char *));
+      strcpy(curdir->filenames[0],x);
+      break;
+    }
+    case 0x11:{ //ls
+      for (int i =0;i<curdir->fileNum;i++){
+        printf("%s\t", curdir->filenames[i]);
+      }
+      printf("\n");
+      break;
+      
     }
     default   : { // unknown
       break;
