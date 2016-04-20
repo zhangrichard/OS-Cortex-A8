@@ -151,7 +151,11 @@ void shell() {
     mkdirr(args[1]);
     // printf("%s\n",dir);
   }
-
+    if(strcmp (args[0],"cd")==0){// 01 01230000 F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF
+    // printf("shell\n" );
+    cd(args[1]);
+    // printf("%s\n",dir);
+  }
 
   // if (strcmp(args[1]),"read")== 0){
   //   char * read;

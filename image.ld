@@ -17,7 +17,7 @@ SECTIONS {
   tos_svc = .;
    
    heap_low = .;
-   . += 0x10000;
+   . += 0x30000;
    heap_top = .;
 
   /* allocate stack for user process   8 users   */

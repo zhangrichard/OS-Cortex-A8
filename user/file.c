@@ -112,6 +112,16 @@ void ls() {
             : "r0" );
   // return r;
 }
+void cd ( void* x ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "svc #18    \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (x)
+            : "r0" );
+  // return r;
+}
 // void pwd( void* x ) {
 //   int r;
 //   asm volatile( "mov r0, %1 \n"

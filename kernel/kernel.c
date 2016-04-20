@@ -122,6 +122,9 @@ void initialising_kernel( ctx_t* ctx){
   initialTable(&fdt);
   initialDirectory(&d);
   curdir = (directory_d *)calloc(1,sizeof(directory_d));
+  curdir->directoryName = "question";
+  curdir->directoryNum =0;
+
   current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 
   irq_enable();
@@ -350,14 +353,22 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     case 0xE:{ // pwd(fd)
       char  *x = ( char* )( ctx->gpr[ 0 ] ); 
       strcpy(x,working_directory);
+      printf("%s\n", working_directory);
       break;
     }
     case 0xF:{ // mkdir(name)
       char  *x = ( char* )( ctx->gpr[ 0 ] ); 
-      directory_d * new = (directory_d *)malloc(sizeof(directory_d));
-      new->directoryName = x;
-      curdir->next_directory = (struct directory_d *)new;
-      printf("create directory%s\n",curdir->next_directory->directoryName );
+      directory_d * new = (directory_d *)calloc(1,sizeof(directory_d *));
+      new->directoryName= x;
+      new->directoryName[strlen(x)] = '\0';
+      // new->directoryName = (strcat(strcat(curdir->directoryName,"/"),x));
+      curdir->next_directory[curdir->directoryNum] = malloc(sizeof(directory_d*));
+      curdir->next_directory[curdir->directoryNum] = (directory_d *)new;
+      curdir->directoryNum++;
+      printf("create directory%s\n",curdir->next_directory[curdir->directoryNum]->directoryName );
+      
+      printf("create directory%s\n",curdir->next_directory[0]->directoryName );
+
       break;
     }
     case 0x10:{ //touch(filename)
@@ -374,9 +385,56 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
         printf("%s ", curdir->filenames[i]);
       }
       if(curdir->next_directory != NULL){
-        printf(" %s\n",curdir->next_directory->directoryName);
+        for (int i =0;i<curdir->directoryNum;i++)
+        printf(" %s\n",curdir->next_directory[i]->directoryName);
       }
       printf("\n");
+      break;
+    }
+    case 0x12:{ //cd(filename)
+      char  *x = ( char* )( ctx->gpr[ 0 ] );
+      // if(strcmp(x,"..")){
+      //   // if(curdir->parent_directory == NULL){
+      //   //   curdir->parent_directory = calloc(1,sizeof(directory_d));
+      //   //   char *token = strtok(curdir->directoryName, "/");
+      //   //   char *name = "" ;
+      //   //   while(token != NULL){
+      //   //     strcat(name, token);
+      //   //     token = strtok(NULL,"/");
+
+      //   //   }
+      //     // printf("name is %s\n",name );
+      //     // curdir->parent_directory->directoryName = name;
+      //   // }
+      //   curdir =curdir->parent_directory;
+      // }
+      // else{
+      printf("cd to %s\n", x);
+        printf("next_directory name%s\n",curdir->directoryName );
+        printf("next_directory name  %s\n",curdir->next_directory[0]->directoryName  );
+        printf("next_directory name  %s\n",curdir->next_directory[1]->directoryName  );
+
+        // int pos =0;
+        for (int i =0;i<curdir->directoryNum;i++){
+          if(strcmp(x,curdir->next_directory[i]->directoryName)){
+            printf("find directory%s\n",curdir->next_directory[i]->directoryName );
+            curdir = curdir->next_directory[i];
+            printf("change cudir %s\n",curdir->directoryName );
+          }
+        }
+        
+      // }
+      char str[80];
+      strcpy(str,working_directory);
+      strcat(str,"/");
+      strcat(str,curdir->directoryName);
+      working_directory = str;
+      free(str);
+      printf("current working_directory  %s\n",working_directory);
+      printf("current directory is %s\n",curdir->directoryName);
+      for (int i = 0;i<strlen(curdir->directoryName);i++){
+        x[i] = curdir->directoryName[i];
+      }
       break;
     }
     default   : { // unknown

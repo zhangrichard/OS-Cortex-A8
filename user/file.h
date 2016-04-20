@@ -16,4 +16,5 @@ void pwd( void* x );
 void touch( void* x );
 void mkdirr( void* x );
 void ls();
+void cd ( void* x );
 #endif
