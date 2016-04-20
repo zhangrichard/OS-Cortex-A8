@@ -20,6 +20,7 @@
 
 pcb_t pcb[ PCB_SIZE ], *current = NULL;
 fdt_t fdt;
+directory_t d;
 static int numberOfProcess =4;
 heap_t *h = NULL;
 // heap_t *m;
@@ -115,6 +116,7 @@ void initialising_kernel( ctx_t* ctx){
 
 // initalize file system
   initialTable(&fdt);
+  initialDirectory(&d);
 
   current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 
@@ -247,7 +249,6 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
           ctx->gpr[0] = false;
           break;
         } 
-        // printf("%d\n", process);   
         InterestFlag[process] = true;
         turn =(process+1)%2;
         // printf("bool %d\n",InterestFlag[(process+1)%2] == true);
@@ -263,15 +264,59 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
     case 0x08:{ //int file_create( int fd, void* x, size_t n ) 8196
 
+      // int   fd = ( int   )( ctx->gpr[ 0 ] );  
+      char*  x = ( char* )( ctx->gpr[ 0 ] );  
+      createFile(&d,x);
+      
+      ctx->gpr[0]= 0;
+      break;
+    }
+   
+    case 0x9:{//fd = open (file,mode)
+
+      char *x = ( char *  )( ctx->gpr[ 0 ] );
+      int   mode = ( int   )( ctx->gpr[1 ] );
+
+      int fd = openFile(&d,&fdt,x,mode);
+      printf("open at fd%d\n",fd );
+      ctx->gpr[0]= fd;
+    }
+    case 0x10:{ // read file
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
-      int    mode = ( int   )( ctx->gpr[ 2 ] ); 
-       if (strlen(x)<16){
-        for (int i = strlen(x);i<16;i++)
-        x[i] = 0 ;
+      int    n = ( int   )( ctx->gpr[ 2 ] );
+      // move the next 16 bype position
+      fdt.file[fd].rwPointer+=1;
+      fdt.file[fd].flags = O_R;
+
+       PL011_puth( UART1, 0x02 );        // write command
+      PL011_putc( UART1, ' '  );        // write separator
+       addr_puth( UART1, fd    );        // write address
+      PL011_putc( UART1, '\n' );        // write EOL
+  
+      if( PL011_geth( UART1 ) == 0x00 ) { // read  command
+      PL011_getc( UART1       );        // read  separator
+       data_geth( UART1, x, 16 );        // read  data
+      PL011_getc( UART1       );  
+      } 
+      printf("reading from address%d\n",fd );
+      disk_rd(fd,x,16);
+      printf("%s\n","read from file" );
+      ctx->gpr[0]= n;
+      break;
+    }
+
+     case 0x12:{ //write(fd,z,4) 
+      int   fd = ( int   )( ctx->gpr[ 0 ] );  
+      char*  z = ( char* )( ctx->gpr[ 1 ] );  
+      int    len = ( int   )( ctx->gpr[ 2 ] ); 
+      // disk_get_block_num();
+      if (strlen(z)<16){
+        for (int i = strlen(z);i<16;i++)
+        z[i] = 0 ;
       } 
       int n= 16;
-      printf("data %s\n", x);
+      printf("data %s\n", z);
       printf("address %d\n",fd );
       printf("size %d\n", n);
      
@@ -280,61 +325,20 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       PL011_putc( UART0, ' '  );        // write separator
        addr_puth( UART0, fd    );        // write address
       PL011_putc( UART0, ' '  );        // write separator
-       data_puth( UART0, x, n );        // write data
+       data_puth( UART0, z, n );        // write data
       PL011_putc( UART0, '\n' );
-      disk_wr(fd,x,n);
-      
-      addFile(&fdt,x,mode);
-      // InterestFlag[current->pid] = false;      
-      ctx->gpr[0]= 0;
-      break;
-    }
-   
-    case 0x9:{//open file
-
-      char *x = ( char *  )( ctx->gpr[ 0 ] );
-      int   rwBit = ( int   )( ctx->gpr[1 ] );
-      int fd=0; //default
-      for (int i = 0;i<fdt.size;i++){
-        if(strcmp(x,fdt.file[i].filename)){
-          fd = fdt.file[i].fd;
-          fdt.file[i].flags = rwBit;
-        }
-      }
-      ctx->gpr[0]= fd;
-    }
-    case 0x10:{ // read file
-      int   fd = ( int   )( ctx->gpr[ 0 ] );  
-      char*  x = ( char* )( ctx->gpr[ 1 ] );  
-      int    n = ( int   )( ctx->gpr[ 2 ] );
-      printf("into syscall %s\n", x);
-      ctx->gpr[0]= 0;
-      break;
-    }
-
-     case 0x11:{ //file_open file
-      int   fd = ( int   )( ctx->gpr[ 0 ] );  
-      char*  x = ( char* )( ctx->gpr[ 1 ] );  
-      int    mode = ( int   )( ctx->gpr[ 2 ] ); 
-      // disk_get_block_num();
-      PL011_puth( UART0, 0x01 );        // write command
-      PL011_putc( UART0, ' '  );        // write separator
-       addr_puth( UART0, fd    );        // write address
-      PL011_putc( UART0, ' '  );        // write separator
-       data_puth( UART0, x, 16 );        // write data
-      PL011_putc( UART0, '\n' );
-      disk_wr(fd,x,16);
+      printf("write to address%d\n",fd );
+      disk_wr(fd,z,16);
      // increase siz
-      printf("return fd %d\n", fd);
+      printf("write file at %d\n", fd);
       ctx->gpr[0]= fd;
       break;
     }
 
     case 0x13:{ // close(fd)
-      char*  filename = ( char* )( ctx->gpr[ 0 ] ); 
-      int index = lookUpIndex(&fdt,filename);
-      freeBlock(&fdt.file[index]);
-      printf("into syscall %s\n", filename);
+      int fd = ( int )( ctx->gpr[ 0 ] ); 
+      
+      closeFile (&fdt,fd);
       ctx->gpr[0]= 0;
       break;
     }

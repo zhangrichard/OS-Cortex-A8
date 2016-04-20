@@ -20,6 +20,7 @@
 //   }
 // }
 // future computation
+int fd;
 int tokenize(buffer_t buffer, int length, args_t args) {
   int i, count = 0, start = -1;
 // https://github.com/alexcoco/alexsh/blob/master/shell.c
@@ -103,13 +104,26 @@ void shell() {
     // exit();
     int pid = atoi(args[1]);
     exit1(pid);
+  }// 1 represent write 0 read
+  if (strcmp(args[0],"create")== 0){// create("file.txt",1)
+    file_create((args[1]));
   }
-  if (strcmp(args[0],"create")== 0){
-    file_create(atoi(args[1]),args[2],16);
+  
+  if (strcmp(args[0],"open")== 0){
+    fd = file_open(args[1],0);
   }
-  if (strcmp(args[0],"close")== 0){
-    file_close(args[1]);
+   if (strcmp(args[0],"read")== 0){
+    char  temp[100];
+    file_read(fd,temp,16);
+    printf("read value is %s\n",temp );
   }
+   if (strcmp(args[0],"write")== 0){
+    file_writes(fd,args[1],16);
+  }
+   if (strcmp(args[0],"close")== 0){
+    file_close(fd);
+  }
+
   // if (strcmp(args[1]),"read")== 0){
   //   char * read;
   //   file_read(fd,read,4);

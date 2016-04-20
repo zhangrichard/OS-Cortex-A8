@@ -21,7 +21,7 @@ void deRegisterInterest();
 
 // write n bytes from x to the file descriptor fd
 int _reads( int fd, void* x, size_t n );
-int write( int fd, void* x, size_t n );
+// int write( int fd, void* x, size_t n );
 int fork();
 int exit1();
 int myStrCmp ( char *s1,  char *s2,int length);
