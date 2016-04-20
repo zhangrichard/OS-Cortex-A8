@@ -121,9 +121,10 @@ void initialising_kernel( ctx_t* ctx){
 // initalize file system
   initialTable(&fdt);
   initialDirectory(&d);
-  curdir = (directory_d *)calloc(1,sizeof(directory_d));
+  curdir = (directory_d *)malloc(sizeof(directory_d));
   curdir->directoryName = "question";
   curdir->directoryNum =0;
+  curdir->fileNum =0;
 
   current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 
@@ -358,24 +359,33 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     }
     case 0xF:{ // mkdir(name)
       char  *x = ( char* )( ctx->gpr[ 0 ] ); 
-      directory_d * new = (directory_d *)calloc(1,sizeof(directory_d *));
-      new->directoryName= x;
-      new->directoryName[strlen(x)] = '\0';
+      directory_d * new = (directory_d *)malloc(sizeof(directory_d));
+      new->directoryName = malloc(sizeof(char*));
+      strcpy(new->directoryName,x);
+      printf("%x\n", new);
+      // printf("%s\n", );
+
       // new->directoryName = (strcat(strcat(curdir->directoryName,"/"),x));
-      curdir->next_directory[curdir->directoryNum] = malloc(sizeof(directory_d*));
-      curdir->next_directory[curdir->directoryNum] = (directory_d *)new;
+      // curdir->next_directory[curdir->directoryNum] = malloc(sizeof(directory_d*));
+      curdir->next_directory = realloc(curdir->next_directory,(curdir->directoryNum+1)*sizeof(directory_d *));
+      curdir->next_directory[curdir->directoryNum] = new;
+      printf("curent 01%x\n",curdir->next_directory[curdir->directoryNum] );
       curdir->directoryNum++;
-      printf("create directory%s\n",curdir->next_directory[curdir->directoryNum]->directoryName );
       
-      printf("create directory%s\n",curdir->next_directory[0]->directoryName );
+      printf("create directory%s\n",curdir->next_directory[curdir->directoryNum-1]->directoryName );
 
       break;
     }
     case 0x10:{ //touch(filename)
       char  *x = ( char* )( ctx->gpr[ 0 ] );
       int fileNum = curdir->fileNum;
+      curdir->filenames = realloc(curdir->filenames, (curdir->fileNum+1)*sizeof(char*));
+      // char * file = malloc(sizeof(char *));
+      // printf("address%x\n", file);
+      // file = x;
       curdir->filenames[fileNum] = malloc(sizeof(char *));
       strcpy(curdir->filenames[fileNum],x);
+      // strcpy(curdir->filenames[fileNum],x);
       printf("create file%s\n", curdir->filenames[fileNum]);
       curdir->fileNum++;
       break;
@@ -385,8 +395,11 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
         printf("%s ", curdir->filenames[i]);
       }
       if(curdir->next_directory != NULL){
-        for (int i =0;i<curdir->directoryNum;i++)
-        printf(" %s\n",curdir->next_directory[i]->directoryName);
+        for (int i =0;i<curdir->directoryNum;i++){
+          printf(" %s\n",curdir->next_directory[i]->directoryName);
+          printf("at %x\n",curdir->next_directory[i]);
+        }
+        
       }
       printf("\n");
       break;
