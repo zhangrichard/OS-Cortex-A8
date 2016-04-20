@@ -25,13 +25,14 @@ typedef struct
 }directory_t;
 
 
-typedef struct 
+typedef struct directory_d
 {
 	char * directoryName;
 	char ** filenames;
 	struct directory_d * next_directory;
 	int size;
 	int fileNum;
+	struct directory_d * parent_directory;
 }directory_d;
 
 

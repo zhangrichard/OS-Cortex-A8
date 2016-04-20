@@ -136,6 +136,23 @@ void shell() {
     pwd(dir);
     printf("%s\n",dir);
   }
+  if(strcmp (args[0],"touch")==0){// 01 01230000 F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF
+    // printf("shell\n" );
+    touch(args[1]);
+    // printf("%s\n",dir);
+  }
+   if(strcmp (args[0],"ls")==0){// 01 01230000 F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF
+    // printf("shell\n" );
+    ls();
+    // printf("%s\n",dir);
+  }
+  if(strcmp (args[0],"mkdir")==0){// 01 01230000 F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF
+    // printf("shell\n" );
+    mkdirr(args[1]);
+    // printf("%s\n",dir);
+  }
+
+
   // if (strcmp(args[1]),"read")== 0){
   //   char * read;
   //   file_read(fd,read,4);

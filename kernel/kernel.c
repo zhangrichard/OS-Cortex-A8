@@ -121,7 +121,7 @@ void initialising_kernel( ctx_t* ctx){
 // initalize file system
   initialTable(&fdt);
   initialDirectory(&d);
-  curdir = (directory_d *)malloc(sizeof(directory_d));
+  curdir = (directory_d *)calloc(1,sizeof(directory_d));
   current = &pcb[3]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 
   irq_enable();
@@ -357,21 +357,27 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       directory_d * new = (directory_d *)malloc(sizeof(directory_d));
       new->directoryName = x;
       curdir->next_directory = (struct directory_d *)new;
+      printf("create directory%s\n",curdir->next_directory->directoryName );
       break;
     }
     case 0x10:{ //touch(filename)
       char  *x = ( char* )( ctx->gpr[ 0 ] );
-      curdir->filenames[0] = malloc(sizeof(char *));
-      strcpy(curdir->filenames[0],x);
+      int fileNum = curdir->fileNum;
+      curdir->filenames[fileNum] = malloc(sizeof(char *));
+      strcpy(curdir->filenames[fileNum],x);
+      printf("create file%s\n", curdir->filenames[fileNum]);
+      curdir->fileNum++;
       break;
     }
     case 0x11:{ //ls
       for (int i =0;i<curdir->fileNum;i++){
-        printf("%s\t", curdir->filenames[i]);
+        printf("%s ", curdir->filenames[i]);
+      }
+      if(curdir->next_directory != NULL){
+        printf(" %s\n",curdir->next_directory->directoryName);
       }
       printf("\n");
       break;
-      
     }
     default   : { // unknown
       break;

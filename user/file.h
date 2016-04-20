@@ -13,4 +13,7 @@ int file_read( int fd, void* x, size_t n );
 int file_writes( int fd, void* x, size_t n );
 
 void pwd( void* x );
+void touch( void* x );
+void mkdirr( void* x );
+void ls();
 #endif

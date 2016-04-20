@@ -82,3 +82,43 @@ void pwd( void* x ) {
             : "r0" );
   // return r;
 }
+void mkdirr( void* x ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "svc #15     \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (x)
+            : "r0" );
+  // return r;
+}
+void touch( void* x ) {
+  int r;
+  asm volatile( "mov r0, %1 \n"
+              "svc #16    \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : "r" (x)
+            : "r0" );
+  // return r;
+}
+
+void ls() {
+  int r;
+  asm volatile("svc #17    \n"
+              "mov %0, r0 \n" 
+            : "=r" (r) 
+            : 
+            : "r0" );
+  // return r;
+}
+// void pwd( void* x ) {
+//   int r;
+//   asm volatile( "mov r0, %1 \n"
+//               "svc #18    \n"
+//               "mov %0, r0 \n" 
+//             : "=r" (r) 
+//             : "r" (x)
+//             : "r0" );
+//   // return r;
+// }
