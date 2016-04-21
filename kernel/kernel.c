@@ -313,22 +313,27 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       int    n = ( int   )( ctx->gpr[ 2 ] );
       // move the next 16 bype position
       char buffer[20];
-      fdt.file[fd].rwPointer+=1;
-      fdt.file[fd].flags = O_R;
+      // fdt.file[fd].rwPointer+=1;
+      // fdt.file[fd].flags = O_R;
 
-       PL011_puth( UART1, 0x02 );        // write command
-      PL011_putc( UART1, ' '  );        // write separator
-       addr_puth( UART1, fd    );        // write address
-      PL011_putc( UART1, '\n' );        // write EOL
+      //  PL011_puth( UART1, 0x02 );        // write command
+      // PL011_putc( UART1, ' '  );        // write separator
+      //  addr_puth( UART1, fd    );        // write address
+      // PL011_putc( UART1, '\n' );        // write EOL
   
-      if( PL011_geth( UART1 ) == 0x00 ) { // read  command
-      PL011_getc( UART1       );        // read  separator
-       data_geth( UART1, buffer, 16 );        // read  data
-      PL011_getc( UART1       );  
-      } 
+      // if( PL011_geth( UART1 ) == 0x00 ) { // read  command
+      // PL011_getc( UART1       );        // read  separator
+      //  data_geth( UART1, buffer, 16 );        // read  data
+      // PL011_getc( UART1       );  
+      // } 
       printf("reading from address%d\n",fd );
       disk_rd(fd,buffer,16);
-      printf("%s\n", buffer);
+      for(int i=0;i<16;i++){
+        PL011_putc(UART0,buffer[i]);
+      }
+      PL011_putc(UART0,'\n');
+      
+      // printf("%s\n", buffer);
 
       printf("%s\n","read from file" );
       ctx->gpr[0]= n;

@@ -123,7 +123,7 @@ void shell() {
    if (strcmp(args[0],"read")== 0){
     char  temp[100];
     file_read(fd,temp,16);
-    printf("read value is %s\n",temp );
+    // printf("read value is %s\n",temp );
   }
    if (strcmp(args[0],"write")== 0){
     file_writes(10,args[1],16);
