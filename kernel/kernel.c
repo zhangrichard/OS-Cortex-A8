@@ -17,12 +17,14 @@
  */
 
 #define DEBUG 0
-char * working_directory = "/Downloads/question";
+char working_directory[100]  = "/Downloads/question";
 pcb_t pcb[ PCB_SIZE ], *current = NULL;
 fdt_t fdt;
 directory_t d;
 
 directory_d *curdir;
+
+directory_d *curdirPointer;
 static int numberOfProcess =4;
 heap_t *h = NULL;
 // heap_t *m;
@@ -32,7 +34,7 @@ int shareInt =100;
 int turn;
 int signalflag = 0;
 
-
+int globalFd = 0;
 
 
 void priorityBaseScheduler( ctx_t* ctx ) {
@@ -285,10 +287,25 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       char *x = ( char *  )( ctx->gpr[ 0 ] );
       int   mode = ( int   )( ctx->gpr[1 ] );
+      int result = -1;
 
-      int fd = openFile(&d,&fdt,x,mode);
-      printf("open at fd%d\n",fd );
-      ctx->gpr[0]= fd;
+      for (int i =0;i<curdir->fileNum;i++){
+        if(strcmp(x,curdir->filenames[i])==0){
+          printf("find it");
+          globalFd+=10;
+          result = globalFd;
+
+          break;
+        }
+      }
+
+      printf("result %d\n",result );
+      
+      // fdt[fdt.fileNum].filename = ;
+      // int fd = openFile(&d,&fdt,x,mode);
+      // printf("open at fd%d\n",globalFd );
+      ctx->gpr[0]= result;
+      break;
     }
     case 0xA:{ // read file
       int   fd = ( int   )( ctx->gpr[ 0 ] );  
@@ -388,6 +405,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       // strcpy(curdir->filenames[fileNum],x);
       printf("create file%s\n", curdir->filenames[fileNum]);
       curdir->fileNum++;
+      createFile(&d,x);
       break;
     }
     case 0x11:{ //ls
@@ -406,47 +424,54 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
     }
     case 0x12:{ //cd(filename)
       char  *x = ( char* )( ctx->gpr[ 0 ] );
-      // if(strcmp(x,"..")){
-      //   // if(curdir->parent_directory == NULL){
-      //   //   curdir->parent_directory = calloc(1,sizeof(directory_d));
-      //   //   char *token = strtok(curdir->directoryName, "/");
-      //   //   char *name = "" ;
-      //   //   while(token != NULL){
-      //   //     strcat(name, token);
-      //   //     token = strtok(NULL,"/");
+      if(strcmp(x,"..") ==0){
 
-      //   //   }
-      //     // printf("name is %s\n",name );
-      //     // curdir->parent_directory->directoryName = name;
-      //   // }
-      //   curdir =curdir->parent_directory;
-      // }
-      // else{
-      printf("cd to %s\n", x);
+      //   if(curdir->parent_directory == NULL){
+      //     curdir->parent_directory = calloc(1,sizeof(directory_d));
+          
+      //   }
+      //   char token[20] = strtok(working_directory, "/");
+      //     char name[20] ;
+      //     while(token != NULL){
+      //       strcat(name, token);
+      //       token = strtok(NULL,"/");
+
+      //     }
+      //     printf("name is %s\n",name );
+      //     curdir->parent_directory->directoryName = name;
+      // //   // }
+      //     strcpy(working_directory,name);
+          curdir =curdir->parent_directory;
+      }
+      else{
+        printf("cd to %s\n", x);
         printf("next_directory name%s\n",curdir->directoryName );
         printf("next_directory name  %s\n",curdir->next_directory[0]->directoryName  );
-        printf("next_directory name  %s\n",curdir->next_directory[1]->directoryName  );
-
+        // printf("next_directory name  %s\n",curdir->next_directory[1]->directoryName  );
+        
         // int pos =0;
         for (int i =0;i<curdir->directoryNum;i++){
-          if(strcmp(x,curdir->next_directory[i]->directoryName)){
+          if(strcmp(x,curdir->next_directory[i]->directoryName)==0){
             printf("find directory%s\n",curdir->next_directory[i]->directoryName );
+            curdir->next_directory[i]->parent_directory = curdir;
             curdir = curdir->next_directory[i];
-            printf("change cudir %s\n",curdir->directoryName );
+            printf("change cudir %s\n",curdirPointer->directoryName );
+            char str[80];
+            strcpy(str,working_directory);
+            strcat(str,"/");
+            strcat(str,curdir->directoryName);
+
+            printf("%s\n",str );
+            strcpy(working_directory,str);
+            break;
           }
         }
-        
-      // }
-      char str[80];
-      strcpy(str,working_directory);
-      strcat(str,"/");
-      strcat(str,curdir->directoryName);
-      working_directory = str;
-      free(str);
-      printf("current working_directory  %s\n",working_directory);
-      printf("current directory is %s\n",curdir->directoryName);
-      for (int i = 0;i<strlen(curdir->directoryName);i++){
-        x[i] = curdir->directoryName[i];
+      // free(str);
+        printf("current working_directory  %s\n",working_directory);
+      // printf("current directory is %s\n",curdir->directoryName);
+        for (int i = 0;i<strlen(curdir->directoryName);i++){
+          x[i] = curdirPointer->directoryName[i];
+        }
       }
       break;
     }
