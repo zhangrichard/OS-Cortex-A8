@@ -312,6 +312,7 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
       char*  x = ( char* )( ctx->gpr[ 1 ] );  
       int    n = ( int   )( ctx->gpr[ 2 ] );
       // move the next 16 bype position
+      char buffer[20];
       fdt.file[fd].rwPointer+=1;
       fdt.file[fd].flags = O_R;
 
@@ -322,11 +323,13 @@ void kernel_handler_svc( ctx_t* ctx, uint32_t id ) {
   
       if( PL011_geth( UART1 ) == 0x00 ) { // read  command
       PL011_getc( UART1       );        // read  separator
-       data_geth( UART1, x, 16 );        // read  data
+       data_geth( UART1, buffer, 16 );        // read  data
       PL011_getc( UART1       );  
       } 
       printf("reading from address%d\n",fd );
-      disk_rd(fd,x,16);
+      disk_rd(fd,buffer,16);
+      printf("%s\n", buffer);
+
       printf("%s\n","read from file" );
       ctx->gpr[0]= n;
       break;
