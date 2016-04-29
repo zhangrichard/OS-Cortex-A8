@@ -28,10 +28,11 @@ by the assignment description of course).  Let us know what third-party
 source code or resources you used (if any) so it's clear what's your work 
 and what isn't:
 
-1.Freedom Embedded. (2010). Using Newlib in ARM bare metal programs. [online] Available at: https://balau82.wordpress.com/2010/12/16/using-newlib-in-arm-bare-metal-programs/ [Accessed 22 Apr. 2016].
+[https://www3.cs.stonybrook.edu/~skiena/392/programs/queue.h,
+https://github.com/alexcoco/alexsh/blob/master/shell.c,
+https://balau82.wordpress.com/2010/12/16/using-newlib-in-arm-bare-metal-programs/
+]
 
-2.Anon, (2016). [online] Available at: https://www3.cs.stonybrook.edu/~skiena/392/programs/queue.h [Accessed 22 Apr. 2016].
-3. GitHub. (2016). alexcoco/alexsh. [online] Available at: https://github.com/alexcoco/alexsh/blob/master/shell.c [Accessed 22 Apr. 2016].
 -------------------------------------------------------------------------------
 
 4. Marking
@@ -66,6 +67,7 @@ Any other documentation, notes or comments that you think are important or
 might be easy to overlook (e.g., a subtle issue or technique in associated
 source code) should go here:
 
-[Ipc implement interprocess communication  share one int]
-[file system implement simple file hierarchy  and enable file to read and write]
+[stage 2] IPC has share memory for one int
+[stage 3] implement file hierarchy ,without read write enable. 
+
 -------------------------------------------------------------------------------

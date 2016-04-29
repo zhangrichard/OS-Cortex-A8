@@ -5,20 +5,6 @@
 
 #include "../device/PL011.h"
 // combine task 3
-
-// static buffer_share bs;
-
-// int turn;
-
-
-
-// void P0() {
-//   char* x = "hello world, I'm P0\n";
-
-//   while( 1 ) {
-//     write( 0, x, 20 ); //yield();
-//   }
-// }
 // future computation
 int fd;
 int tokenize(buffer_t buffer, int length, args_t args) {
@@ -76,13 +62,6 @@ void shell() {
   char * output = "output is : \n";
   char * p0 = "p0 thread\n";
 
-//initialise
-  // init_buffer_share(&bs);
-  // int x = 0;
-  
-  // turn = 0;
-
-  
   while(1){
   printf("%s\n","/Downloads/question$" );
   int length;  
