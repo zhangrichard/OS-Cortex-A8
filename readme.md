@@ -1,71 +1,45 @@
--------------------------------------------------------------------------------
+# OS-Cortex-A8
 
-1. Instructions
+Adapted from the COMS20001 unit at the University of Bristol.
 
-- replace any [...] with free text,
-  and
-- replace the [?] with an X if you have completed that stage,
-- replace the [?] with an * if you have attempted that stage, but you know
-  it doesn't work completely; document why you think it doesn't work, plus
-  what you would do to fix the problem, at the end of the marksheet.
 
--------------------------------------------------------------------------------
+## Features
 
-2. Information
+### Current
 
-So that we can calibrate and improve the assignment in the future, give us
-a rough idea how long (in hours) you spent on it *in total*:
+* Communication over UART
+* Basic interrupt handling
+* Pre-emptive multi-tasking
+* Dynamic creation and destruction of process with `fork()` and `exit()`
+* An interactive shell.
+* A scheduler pre-defined priority processes
+* Basic shell utilities: `cd`, `ls`, `mkdir`, `pwd`, `touch`, `write`
+* Asynchronous message-passing IPC
 
-effort : [120] hours
 
--------------------------------------------------------------------------------
+## Supported platforms
 
-3. Citation
+* RealView Platform Cortex-A8 (tested in QEMU)
 
-Clearly it might have an influence on your mark, but the use of third-party
-resources *is* allowed *if* correctly cited (unless explicitly prohibited 
-by the assignment description of course).  Let us know what third-party 
-source code or resources you used (if any) so it's clear what's your work 
-and what isn't:
+## Build and Run
 
-1.Freedom Embedded. (2010). Using Newlib in ARM bare metal programs. [online] Available at: https://balau82.wordpress.com/2010/12/16/using-newlib-in-arm-bare-metal-programs/ [Accessed 22 Apr. 2016].
+* `make build`
+* `make launch-qemu`
+* `make launch-gdb`
 
-2.Anon, (2016). [online] Available at: https://www3.cs.stonybrook.edu/~skiena/392/programs/queue.h [Accessed 22 Apr. 2016].
-3. GitHub. (2016). alexcoco/alexsh. [online] Available at: https://github.com/alexcoco/alexsh/blob/master/shell.c [Accessed 22 Apr. 2016].
--------------------------------------------------------------------------------
 
-4. Marking
 
-The following gives a stage-by-stage description of the assignment marking
-scheme.  Note this acts as an indicative guideline only, including weights
-for each more obvious element (e.g., the functional correctness of a stage).
-For example, other elements outside this list *often* warrant an increase
-or decrease in marks; examples include hard to quantify features such as
-the style or efficiency of a solution.
 
-[x] Stage 1 : pre-emptive operating system kernel                    ( 30%)
+## Available system calls
 
-    Stage 2 : close generalisations and enhancements
-[x]           - fork and exit system calls                           ( 10%)
-[x]           - priority based scheduler                             ( 10%)
-[*]           - Inter-Process Communication (IPC)                    ( 10%)
+* `void exit(int pid)` - terminate the current process
+* `void fork(int pid)` - duplicate the giving pid process
+* `int32_t _read(int32_t fd, char* buf, size_t nbytes)` - read some bytes from a file
+* `size_t _write(int32_t fd, char* buf, size_t nbytes)` - write some bytes to a file
+* ` _open(char* pathname, int32_t flags)` - open a file and get its file descriptor
+* `int32_t _close(filedesc_t fd)` - close a file by its file descriptor
+* `int32_t _chdir(char* path)` - change the current working directory
+* `int32_t _mkdir(char* path)` - create a new directory
 
-    Stage 3 : open  generalisations and enhancements
-[*]           - file system based on simplified, emulated disk       ( 40%)
-                *OR*
-[?]           - kernel port to real, physical hardware               ( 40%)
 
-                                                                     ------
-                                                                     (100%)
 
--------------------------------------------------------------------------------
-
-5. Documentation
-
-Any other documentation, notes or comments that you think are important or
-might be easy to overlook (e.g., a subtle issue or technique in associated
-source code) should go here:
-
-[Ipc implement interprocess communication  share one int]
-[file system implement simple file hierarchy  and enable file to read and write]
--------------------------------------------------------------------------------
